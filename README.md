@@ -2,6 +2,8 @@
 
 Free as in freedom microsoft windows terminal server cleanup script.
 
+The current change log can be found [here](CHANGELOG.md).
+
 ## Configuration and using it
 
 This script comes out of the box in a "ready to execute" way.
