@@ -7,6 +7,7 @@ The current change log can be found [here](CHANGELOG.md).
 This Skript is currently tested on:
 
 * Windows Server 2012 - Version 6.2 (Build 9200)
+* Windows Server 2012 R2 - Version 6.3 (Build 9600)
 * Windows 10 - Version 20H2 (Build 19042.870)
 
 ## Configuration and using it
