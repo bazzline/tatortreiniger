@@ -31,7 +31,6 @@ Function Create-TruncableObject {
         check_for_duplicates_greater_than_megabyte = $checkForDuplicatesGreaterThanMegabyte
     }
     $object = New-Object psobject -Property $properties
-    
 
     return $object
 }
