@@ -4,6 +4,11 @@ Free as in freedom microsoft windows terminal server cleanup script.
 
 The current change log can be found [here](CHANGELOG.md).
 
+This Skript is currently tested on:
+
+* Windows Server 2012 - Version 6.2 (Build 9200)
+* Windows 10 - Version 20H2 (Build 19042.870)
+
 ## Configuration and using it
 
 This script comes out of the box in a "ready to execute" way.
