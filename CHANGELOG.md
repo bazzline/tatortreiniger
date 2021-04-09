@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### To Add
 
+* added default value `$false` to each optional parameter `$beVerbose`
+
 ### To Change
 
 * Evaluate how easy it is to use the collection of paths and create full qualifyed paths out of it
