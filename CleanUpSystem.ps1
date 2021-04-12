@@ -45,7 +45,7 @@ Function Create-LockFileOrExit {
         [string]$logFilePath,
 
         [Parameter(Mandatory = $false)]
-        [bool]$beVerbose
+        [bool]$beVerbose = $false
     )
 
     If (Test-Path $lockFilePath) {
@@ -72,7 +72,7 @@ Function Release-LockFile {
         [string]$logFilePath,
 
         [Parameter(Mandatory = $false)]
-        [bool]$beVerbose
+        [bool]$beVerbose = $false
     )
 
     If (Test-Path $lockFilePath) {
@@ -129,7 +129,7 @@ Function Log-Message {
         [int]$logLevel = 3,
 
         [Parameter(Mandatory = $false)]
-        [bool]$beVerbose
+        [bool]$beVerbose = $false
     )
 
     If ($logLevel -ge $globalLogLevel) {
@@ -164,7 +164,7 @@ Function Log-Debug {
         [string]$message,
 
         [Parameter(Mandatory = $false)]
-        [bool]$beVerbose
+        [bool]$beVerbose = $false
     )
 
     Log-Message $path $message 1 $beVerbose
@@ -180,7 +180,7 @@ Function Log-Info {
         [string]$message,
 
         [Parameter(Mandatory = $false)]
-        [bool]$beVerbose
+        [bool]$beVerbose = $false
     )
 
     Log-Message $path $message 2 $beVerbose
@@ -196,7 +196,7 @@ Function Log-Error {
         [string]$message,
 
         [Parameter(Mandatory = $false)]
-        [bool]$beVerbose
+        [bool]$beVerbose = $false
     )
 
     Log-Message $path $message 4 $beVerbose
@@ -209,7 +209,7 @@ Function Log-Diskspace {
         [string]$path,
 
         [Parameter(Mandatory = $false)]
-        [bool]$beVerbose
+        [bool]$beVerbose = $false
     )
 
     $logicalDisk = Get-WmiObject Win32_LogicalDisk | Where-Object { $_.DriveType -eq "3" }
