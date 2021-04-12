@@ -74,6 +74,5 @@ $collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\AppDat
 #  eo: user temp folder
 
 #  bo: user general
-$collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\Downloads' 21 $true 32)) | Out-Null
 #  eo: user general
 #eo: path section

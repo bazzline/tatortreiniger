@@ -31,4 +31,7 @@
 #   Following is an example with real data
 #   $collectionOfTruncableObjects.Add((Create-TruncableObject 'C:\Users\$user\...' 7 $true 32)) | Out-Null
 ####
+#  bo: user general
+#$collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\Downloads' 21 $true 32)) | Out-Null
+#  eo: user general
 #eo: path section

@@ -23,6 +23,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
+* Moved pre configured path `c:\Users\$user\Downloads` from `globalConfiguration.ps1` to `localConfiguration.ps1.dist`
+
 ## [0.9.0](https://github.com/bazzline/tatortreiniger/tree/0.9.0) - released at 20210408
 
 ### Added
