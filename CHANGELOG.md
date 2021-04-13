@@ -19,9 +19,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 * Refactor "Log-Message" and the other "Log-*" functions
     * Split it into "Log-Message" and "Output-Message" to ease up log with log level verbose but display only with information
     * Maybe create a "outputVerboseLevel" similar to "logLevel" setting
-* Evaluate if "Remove-Item" is really the right case when iterating over a "my\path\*" when having no limitation like "days to keep = 0"
-    * Maybe just "Remove-Item" but check if we can skip the "matchingItems" list
-    * Maybe just call "Remove-Item" on the long list "Remove-item "my\path\*"
 
 ## [Unreleased]
 
