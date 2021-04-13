@@ -27,6 +27,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
+### Changed
+
+## [0.10.0](https://github.com/bazzline/tatortreiniger/tree/0.10.0) - released at 20210408
+
+### Added
+
 * Added this changelog
 * Added changelog to do list
 * Added info log about the amount of files to be removed
