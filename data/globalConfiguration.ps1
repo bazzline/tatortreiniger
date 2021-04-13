@@ -21,7 +21,7 @@ $logDirectoryPath = ($PSScriptRoot + "\log\")
 #  bo: system paths
 $collectionOfTruncableObjects.Add((Create-TruncableObject $logDirectoryPath 28)) | Out-Null
 $collectionOfTruncableObjects.Add((Create-TruncableObject "C:\Temp\*" 0)) | Out-Null
-$collectionOfTruncableObjects.Add((Create-TruncableObject "C:\Windows\Temp\*" 0)) | Out-Null
+#$collectionOfTruncableObjects.Add((Create-TruncableObject "C:\Windows\Temp\*" 0)) | Out-Null
 #$collectionOfTruncableObjects.Add((Create-TruncableObject "C:\Windows\Logs\*\*" 0)) | Out-Null
 $collectionOfTruncableObjects.Add((Create-TruncableObject "C:\ProgramData\Microsoft\Windows\WER\*" 0)) | Out-Null
 $collectionOfTruncableObjects.Add((Create-TruncableObject "C:\Windows\System32\LogFiles\*\*" 7)) | Out-Null

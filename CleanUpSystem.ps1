@@ -296,13 +296,23 @@ Function Truncate-Path {
     If ($processPath) {
         Log-Info $logFilePath "Truncating path >>${path}<<" $beVerbose
 
-        $lastPossibleDate = (Get-Date).AddDays(-$daysToKeepOldFile)
-        Log-Info $logFilePath "   Removing entries older than >>${lastPossibleDate}<<" $beVerbose
+        If ($dayToKeepOldFile -ne 0) {
+            $lastPossibleDate = (Get-Date).AddDays(-$daysToKeepOldFile)
+            Log-Info $logFilePath "   Removing entries older than >>${lastPossibleDate}<<" $beVerbose
 
-        $matchingItems = Get-ChildItem -Path "$path" -Recurse -File -ErrorAction SilentlyContinue | Where-Object LastWriteTime -LT $lastPossibleDate
+            $matchingItems = Get-ChildItem -Path "$path" -Recurse -ErrorAction SilentlyContinue | Where-Object LastWriteTime -LT $lastPossibleDate
+        } Else {
+            Log-Info $logFilePath "   Removing all entries, no date limit provided." $beVerbose
+
+            $matchingItems = Get-ChildItem -Path "$path" -Recurse -ErrorAction SilentlyContinue
+        }
+
+        $numberOfItemsToRemove = $matchingItems.Count
+
+        Log-Info $logFilePath "   Removing >>${numberOfItemsToRemove}<< entries." $beVerbose
 
         ForEach ($matchingItem In $matchingItems) {
-            Log-Debug $logFilePath "   Removing item >>${matchingItem}<<."
+            Log-Debug $logFilePath "   Trying to remove item >>${matchingItem}<<." $beVerbose
 
             If (!$isDryRun) {
                 Remove-Item -Path "$path\$matchingItem" -Force -ErrorAction SilentlyContinue
@@ -317,6 +327,10 @@ Function Truncate-Path {
 
             $matchingItems = Get-ChildItem -Path "$path" -Recurse -File -ErrorAction SilentlyContinue | Where-Object Length -ge $matchingFileSizeInByte
 
+            $numberOfItemsToRemove = $matchingItems.Count
+
+            Log-Info $logFilePath "   Checking >>${numberOfItemsToRemove}<< entries of being duplicates." $beVerbose
+
             ForEach ($matchingItem In $matchingItems) {
                 $fileHashObject = Get-FileHash -Path "$path\$matchingItem" -Algorithm MD5
 
@@ -326,10 +340,13 @@ Function Truncate-Path {
                     Log-Debug $logFilePath "   Found duplicated hash >>${fileHash}<<, removing >>${path}\${matchingItem}<<." $beVerbose
 
                     If (!$isDryRun) {
+                        Log-Debug $logFilePath "   Trying to remove item >>${path}\${matchingItem}<<." $beVerbose
+
                         Remove-Item -Path "$path\$matchingItem" -Force -ErrorAction SilentlyContinue
                     }
                 } Else {
                     Log-Debug $logFilePath "   Adding key >>${fileHash}<< with value >>${matchingItem}<<." $beVerbose
+
                     $listOfFileHashToFilePath.Add($fileHash, $matchingItem)
                 }
             }
