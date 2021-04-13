@@ -29,7 +29,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
-## [0.10.0](https://github.com/bazzline/tatortreiniger/tree/0.10.0) - released at 20210408
+## [0.10.0](https://github.com/bazzline/tatortreiniger/tree/0.10.0) - released at 20210413
 
 ### Added
 
