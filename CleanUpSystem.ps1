@@ -294,20 +294,24 @@ Function Truncate-Path {
     }
 
     If ($processPath) {
-        Log-Info $logFilePath "Truncating path >>${path}<<" $beVerbose
+        Log-Info $logFilePath "Truncating path >>${path}<< with day to keep old file value of >>$daysToKeepOldFile<<." $beVerbose
 
-        If ($dayToKeepOldFile -ne 0) {
+        If ($daysToKeepOldFile -ne 0) {
             $lastPossibleDate = (Get-Date).AddDays(-$daysToKeepOldFile)
-            Log-Info $logFilePath "   Removing entries older than >>${lastPossibleDate}<<" $beVerbose
+            Log-Info $logFilePath "   Removing entries older than >>${lastPossibleDate}<<." $beVerbose
 
             $matchingItems = Get-ChildItem -Path "$path" -Recurse -ErrorAction SilentlyContinue | Where-Object LastWriteTime -LT $lastPossibleDate
 
             $numberOfItemsToRemove = $matchingItems.Count
 
             Log-Info $logFilePath "   Removing >>${numberOfItemsToRemove}<< entries." $beVerbose
+            
+            ForEach ($matchingItem In $matchingItems) {
+                Log-Debug $logFilePath "   Trying to remove item >>${matchingItem}<<." $beVerbose
 
-            If (!$isDryRun) {
-                Remove-Item -Path "$path" -Force -ErrorAction SilentlyContinue
+                If (!$isDryRun) {
+                    Remove-Item -Path "$path\$matchingItem" -Force -ErrorAction SilentlyContinue
+                }
             }
         } Else {
             Log-Info $logFilePath "   Removing all entries, no date limit provided." $beVerbose
@@ -317,13 +321,9 @@ Function Truncate-Path {
             $numberOfItemsToRemove = $matchingItems.Count
 
             Log-Info $logFilePath "   Removing >>${numberOfItemsToRemove}<< entries." $beVerbose
-
-            ForEach ($matchingItem In $matchingItems) {
-                Log-Debug $logFilePath "   Trying to remove item >>${matchingItem}<<." $beVerbose
-
-                If (!$isDryRun) {
-                    Remove-Item -Path "$path\$matchingItem" -Force -ErrorAction SilentlyContinue
-                }
+            
+            If (!$isDryRun) {
+                Remove-Item -Path "$path" -Recurse -Force -ErrorAction SilentlyContinue
             }
         }
 
