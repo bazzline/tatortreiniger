@@ -32,6 +32,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 * Added info log about the amount of files to be removed
 * Added check if "days to keep" is `0`
     * If the value is `0` we will use the "just give me all items from this path" instead of "just give me items for fitting date" mechanism
+    * If the value is `0`, we will call `Remote-Item` on the path without using the result from "Get-Childitem"
 
 ### Changed
 

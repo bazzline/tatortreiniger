@@ -301,21 +301,29 @@ Function Truncate-Path {
             Log-Info $logFilePath "   Removing entries older than >>${lastPossibleDate}<<" $beVerbose
 
             $matchingItems = Get-ChildItem -Path "$path" -Recurse -ErrorAction SilentlyContinue | Where-Object LastWriteTime -LT $lastPossibleDate
+
+            $numberOfItemsToRemove = $matchingItems.Count
+
+            Log-Info $logFilePath "   Removing >>${numberOfItemsToRemove}<< entries." $beVerbose
+
+            If (!$isDryRun) {
+                Remove-Item -Path "$path" -Force -ErrorAction SilentlyContinue
+            }
         } Else {
             Log-Info $logFilePath "   Removing all entries, no date limit provided." $beVerbose
 
             $matchingItems = Get-ChildItem -Path "$path" -Recurse -ErrorAction SilentlyContinue
-        }
 
-        $numberOfItemsToRemove = $matchingItems.Count
+            $numberOfItemsToRemove = $matchingItems.Count
 
-        Log-Info $logFilePath "   Removing >>${numberOfItemsToRemove}<< entries." $beVerbose
+            Log-Info $logFilePath "   Removing >>${numberOfItemsToRemove}<< entries." $beVerbose
 
-        ForEach ($matchingItem In $matchingItems) {
-            Log-Debug $logFilePath "   Trying to remove item >>${matchingItem}<<." $beVerbose
+            ForEach ($matchingItem In $matchingItems) {
+                Log-Debug $logFilePath "   Trying to remove item >>${matchingItem}<<." $beVerbose
 
-            If (!$isDryRun) {
-                Remove-Item -Path "$path\$matchingItem" -Force -ErrorAction SilentlyContinue
+                If (!$isDryRun) {
+                    Remove-Item -Path "$path\$matchingItem" -Force -ErrorAction SilentlyContinue
+                }
             }
         }
 
