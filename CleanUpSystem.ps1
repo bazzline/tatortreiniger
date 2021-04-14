@@ -360,8 +360,8 @@ Function Truncate-Path {
         [Parameter(Mandatory = $true)]
         [string]$logFilePath,
 
-        [Parameter(Mandatory = $false)]
-        [int]$numberOfRemovedFileSystemObjects = 0,
+        [Parameter(Mandatory = $true)]
+        [int]$numberOfRemovedFileSystemObjects,
 
         [Parameter(Mandatory = $false)]
         [bool]$beVerbose,
