@@ -236,6 +236,9 @@ Function Create-StatisticObject {
         [object]$endDiskInformation
     )
 
+    $startFreeSizeInGB = $startDiskInformation.free_size_in_gb -replace ",", "."
+    $endFreeSizeInGB = $endDiskInformation.free_size_in_gb -replace ",", "."
+
     $properties = @{
         runtime = @{
             hours = $runDatetime.Hours
@@ -244,7 +247,7 @@ Function Create-StatisticObject {
         }
         disk = @{
             number_of_removed_file_system_objects = $numberOfRemovedFileSystemObjects
-            freed_up_disk_space = ($startDiskInformation.free_size_in_gb - $endDiskInformation.free_size_in_gb)
+            freed_up_disk_space = ($endFreeSizeInGB - $startFreeSizeInGB)
         }
     }
 

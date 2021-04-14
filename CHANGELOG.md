@@ -19,6 +19,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 * Refactor "Log-Message" and the other "Log-*" functions
     * Split it into "Log-Message" and "Output-Message" to ease up log with log level verbose but display only with information
     * Maybe create a "outputVerboseLevel" similar to "logLevel" setting
+    * or ...
+        * Create object Logger and Messenger
+        * Create MessengerCollection
+        * Pass the MessengerCollection to each function
 
 ## [Unreleased]
 
