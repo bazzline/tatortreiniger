@@ -29,6 +29,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
     * Number of free-ed up disk space
     * Number of removed files
 * Added function `Create-DiskInformation`
+* Added the check to only run duplicate check if there are at least two entries in the collection
 
 ### Changed
 

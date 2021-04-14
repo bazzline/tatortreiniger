@@ -427,27 +427,31 @@ Function Truncate-Path {
 
             $numberOfItemsToRemove = $matchingItems.Count
 
-            Log-Info $logFilePath "   Checking >>${numberOfItemsToRemove}<< entries of being duplicates." $beVerbose
+            If ($matchingItems.Count -gt 1 ) {
+                Log-Info $logFilePath "   Checking >>${numberOfItemsToRemove}<< entries of being duplicates." $beVerbose
 
-            ForEach ($matchingItem In $matchingItems) {
-                $fileHashObject = Get-FileHash -Path "$path\$matchingItem" -Algorithm MD5
+                ForEach ($matchingItem In $matchingItems) {
+                    $fileHashObject = Get-FileHash -Path "$path\$matchingItem" -Algorithm MD5
 
-                $fileHash = $fileHashObject.Hash
+                    $fileHash = $fileHashObject.Hash
 
-                If ($listOfFileHashToFilePath.ContainsKey($fileHash)) {
-                    Log-Debug $logFilePath "   Found duplicated hash >>${fileHash}<<, removing >>${path}\${matchingItem}<<." $beVerbose
+                    If ($listOfFileHashToFilePath.ContainsKey($fileHash)) {
+                        Log-Debug $logFilePath "   Found duplicated hash >>${fileHash}<<, removing >>${path}\${matchingItem}<<." $beVerbose
 
-                    If (!$isDryRun) {
-                        Log-Debug $logFilePath "   Trying to remove item >>${path}\${matchingItem}<<." $beVerbose
+                        If (!$isDryRun) {
+                            Log-Debug $logFilePath "   Trying to remove item >>${path}\${matchingItem}<<." $beVerbose
 
-                        Remove-Item -Path "$path\$matchingItem" -Force -ErrorAction SilentlyContinue
-                        ++$numberOfRemovedFileSystemObjects
+                            Remove-Item -Path "$path\$matchingItem" -Force -ErrorAction SilentlyContinue
+                            ++$numberOfRemovedFileSystemObjects
+                        }
+                    } Else {
+                        Log-Debug $logFilePath "   Adding key >>${fileHash}<< with value >>${matchingItem}<<." $beVerbose
+
+                        $listOfFileHashToFilePath.Add($fileHash, $matchingItem)
                     }
-                } Else {
-                    Log-Debug $logFilePath "   Adding key >>${fileHash}<< with value >>${matchingItem}<<." $beVerbose
-
-                    $listOfFileHashToFilePath.Add($fileHash, $matchingItem)
                 }
+            } Else {
+                Log-Debug $logFilePath "   Less than two matching entries in the collection. Skipping duplicate check." $beVerbose
             }
         }
     }
