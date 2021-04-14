@@ -202,6 +202,24 @@ Function Log-Error {
     Log-Message $path $message 4 $beVerbose
 }
 
+Function Create-DiskInformation {
+    $logicalDisk = Get-WmiObject Win32_LogicalDisk | Where-Object { $_.DriveType -eq "3" }
+
+    $totalSizeInGB = "{0:N1}" -f ( $logicalDisk.Size / 1gb)
+    $freeSizeInGB = "{0:N1}" -f ( $logicalDisk.Freespace / 1gb )
+    $freeSizeInPercentage = "{0:P1}" -f ( $logicalDisk.FreeSpace / $logicalDisk.Size )
+
+    $properties = @{
+        device_id = $logicalDisk.DeviceId
+        total_size_in_gb = $totalSizeInGb
+        free_size_in_gb = $freeSizeInGB
+        free_size_in_percentage = $freeSizeInPercentage
+    }
+    $object = New-Object psobject -Property $properties
+
+    return $object
+}
+
 Function Log-Diskspace {
     [CmdletBinding()]
     param(
@@ -212,14 +230,10 @@ Function Log-Diskspace {
         [bool]$beVerbose = $false
     )
 
-    $logicalDisk = Get-WmiObject Win32_LogicalDisk | Where-Object { $_.DriveType -eq "3" }
+    $diskInformation = Create-DiskInformation
 
-    $totalSizeInGB = "{0:N1}" -f ( $logicalDisk.Size / 1gb)
-    $freeSizeInGB = "{0:N1}" -f ( $logicalDisk.Freespace / 1gb )
-    $freeSizeInPercentage = "{0:P1}" -f ( $logicalDisk.FreeSpace / $logicalDisk.Size )
-
-    Log-Info $path "Drive: ${logicalDisk.DeviceID}, Total Size (GB) ${totalSizeInGB}, Free Size (GB} ${freeSizeInGB}, Free size in percentage ${freeSizeInPercentage}" $beVerbose
-
+    Log-Info $path "Drive: ${diskInformation.device_id}, Total Size (GB) ${diskInformation.total_size_in_gb}, Free Size (GB} ${diskInformation.free_size_in_gb}, Free size in percentage ${diskInformation.free_size_in_percentage}" $beVerbose
+    
 }
 
 Function Log-Statistics {
