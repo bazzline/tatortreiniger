@@ -220,19 +220,55 @@ Function Create-DiskInformation {
     return $object
 }
 
+Function Create-StatisticObject {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [System.TimeSpan]$runDatetime,
+
+        [Parameter(Mandatory = $true)]
+        [int]$numberOfRemovedFileSystemObjects,
+
+        [Parameter(Mandatory = $true)]
+        [object]$startDiskInformation,
+
+        [Parameter(Mandatory = $true)]
+        [object]$endDiskInformation
+    )
+
+    $properties = @{
+        runtime = @{
+            hours = $runDatetime.Hours
+            minutes = $runDatetime.Minutes
+            seconds = $runDatetime.Seconds
+        }
+        disk = @{
+            number_of_removed_file_system_objects = $numberOfRemovedFileSystemObjects
+            freed_up_disk_space = ($startDiskInformation.free_size_in_gb - $endDiskInformation.free_size_in_gb)
+        }
+    }
+
+    $object = New-Object psobject -Property $properties
+
+    return $object
+}
+
 Function Log-Diskspace {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
         [string]$path,
 
+        [Parameter(Mandatory = $true)]
+        [object]$diskInformation,
+
         [Parameter(Mandatory = $false)]
         [bool]$beVerbose = $false
     )
 
-    $diskInformation = Create-DiskInformation
+    $message = "Drive: {0}, Total Size (GB) {1}, Free Size (GB) {2}, Free size in percentage {3}" -f $diskInformation.device_id, $diskInformation.total_size_in_gb, $diskInformation.free_size_in_gb, $diskInformation.free_size_in_percentage
 
-    Log-Info $path "Drive: ${diskInformation.device_id}, Total Size (GB) ${diskInformation.total_size_in_gb}, Free Size (GB} ${diskInformation.free_size_in_gb}, Free size in percentage ${diskInformation.free_size_in_percentage}" $beVerbose
+    Log-Info $path $message $beVerbose
     
 }
 
@@ -243,14 +279,19 @@ Function Log-Statistics {
         [string]$path,
 
         [Parameter(Mandatory = $true)]
-        [DateTime]$runDateTime,
+        [object]$statisticObject,
 
         [Parameter(Mandatory = $false)]
         [bool]$beVerbose = $false
     )
 
     Log-Info $path ":: Statistics ::" $beVerbose
-    Log-Info $path "   Runtime ${runDateTime.Hours} hours, ${runDateTime.Minutes} minutes, ${runDateTime.Seconds} seconds." $beVerbose
+
+    $message = "   Runtime: Hours >>{0}<<, Minutes >>{1}<<, Seconds >>{2}<<." -f $statisticObject.runtime.hours, $statisticObject.runtime.minutes, $statisticObject.runtime.seconds
+    Log-Info $path $message $beVerbose
+
+    $message = "   Freed up disk space >>{0}<< Number of removed file system objects >>{1}<<." -f $statisticObject.disk.freed_up_disk_space, $statisticObject.disk.number_of_removed_file_system_objects
+    Log-Info $path $message $beVerbose
 }
 
 
@@ -276,18 +317,23 @@ Function CleanUpSystem {
 
     #bo: clean up
     $startDateTime = Get-Date
+    $startDiskInformation = Create-DiskInformation
 
     Create-LockFileOrExit $lockFilePath $logFilePath $beVerbose
 
-    Log-DiskSpace $logFilePath $beVerbose
+    Log-DiskSpace $logFilePath $startDiskInformation $beVerbose
 
-    Truncate-Paths $collectionOfTruncableObjects $logFilePath $beVerbose
-
-    Log-DiskSpace $logFilePath $beVerbose
+    $numberOfRemovedFileSystemObjects = Truncate-Paths $collectionOfTruncableObjects $logFilePath $beVerbose
 
     $runDateTime = (Get-Date).Subtract($startDateTime)
 
-    Log-Statistics $logFilePath $beVerbose $runDateTime
+    $endDiskInformation = Create-DiskInformation
+
+    $statisticObject = Create-StatisticObject $runDatetime $numberOfRemovedFileSystemObjects $startDiskInformation $endDiskInformation
+
+    Log-DiskSpace $logFilePath $endDiskinformation $beVerbose
+
+    Log-Statistics $logFilePath $statisticObject $beVerbose
 
     Release-LockFile $lockFilePath $logFilePath $beVerbose
     #eo: clean up
@@ -310,6 +356,9 @@ Function Truncate-Path {
 
         [Parameter(Mandatory = $true)]
         [string]$logFilePath,
+
+        [Parameter(Mandatory = $false)]
+        [int]$numberOfRemovedFileSystemObjects = 0,
 
         [Parameter(Mandatory = $false)]
         [bool]$beVerbose,
@@ -350,6 +399,7 @@ Function Truncate-Path {
 
                 If (!$isDryRun) {
                     Remove-Item -Path "$path\$matchingItem" -Force -ErrorAction SilentlyContinue
+                    ++$numberOfRemovedFileSystemObjects
                 }
             }
         } Else {
@@ -363,6 +413,7 @@ Function Truncate-Path {
             
             If (!$isDryRun) {
                 Remove-Item -Path "$path" -Recurse -Force -ErrorAction SilentlyContinue
+                ++$numberOfRemovedFileSystemObjects
             }
         }
 
@@ -390,6 +441,7 @@ Function Truncate-Path {
                         Log-Debug $logFilePath "   Trying to remove item >>${path}\${matchingItem}<<." $beVerbose
 
                         Remove-Item -Path "$path\$matchingItem" -Force -ErrorAction SilentlyContinue
+                        ++$numberOfRemovedFileSystemObjects
                     }
                 } Else {
                     Log-Debug $logFilePath "   Adding key >>${fileHash}<< with value >>${matchingItem}<<." $beVerbose
@@ -399,6 +451,8 @@ Function Truncate-Path {
             }
         }
     }
+
+    Return $numberOfRemovedFileSystemObjects
 }
 
 Function Truncate-Paths {
@@ -416,6 +470,7 @@ Function Truncate-Paths {
 
     $listOfUserPaths = Get-ChildItem "C:\Users" | Select-Object Name
     $listOfUserNames = $listOfUserPaths.Name
+    $numberOfRemovedFileSystemObjects = 0
 
     ForEach ($currentObject In $collectionOfTruncableObjects) {
         #check if path ends with a wildcard
@@ -423,12 +478,14 @@ Function Truncate-Paths {
             ForEach ($currentUserName In $listOfUserNames) {
                 $currentUserDirectryPath = $currentObject.path -replace '\$user', $currentUserName
                
-                Truncate-Path $currentUserDirectryPath $currentObject.days_to_keep_old_file $currentObject.check_for_duplicates $currentObject.check_for_duplicates_greater_than_megabyte $logFilePath $beVerbose $isDryRun
+                $numberOfRemovedFileSystemObjects = Truncate-Path $currentUserDirectryPath $currentObject.days_to_keep_old_file $currentObject.check_for_duplicates $currentObject.check_for_duplicates_greater_than_megabyte $logFilePath $numberOfRemovedFileSystemObjects $beVerbose $isDryRun
             }
         } Else {
-            Truncate-Path $currentObject.path $currentObject.days_to_keep_old_file $currentObject.check_for_duplicates $currentObject.check_for_duplicates_greater_than_megabyte $logFilePath $beVerbose $isDryRun
+            $numberOfRemovedFileSystemObjects = Truncate-Path $currentObject.path $currentObject.days_to_keep_old_file $currentObject.check_for_duplicates $currentObject.check_for_duplicates_greater_than_megabyte $logFilePath $numberOfRemovedFileSystemObjects $beVerbose $isDryRun
         }
     }
+
+    Return $numberOfRemovedFileSystemObjects
 }
 
 CleanUpSystem

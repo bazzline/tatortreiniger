@@ -24,6 +24,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
+* Added statistic output as information message on last line
+    * Runtime
+    * Number of free-ed up disk space
+    * Number of removed files
+* Added function `Create-DiskInformation`
+
 ### Changed
 
 ## [0.10.0](https://github.com/bazzline/tatortreiniger/tree/0.10.0) - released at 20210413
