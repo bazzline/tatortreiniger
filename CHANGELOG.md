@@ -37,6 +37,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
+* Changed function names to aligne with [approved verbs](https://docs.microsoft.com/de-de/powershell/scripting/developer/cmdlet/approved-verbs-for-windows-powershell-commands?view=powershell-7.1)
+
 ## [0.10.0](https://github.com/bazzline/tatortreiniger/tree/0.10.0) - released at 20210413
 
 ### Added

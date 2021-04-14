@@ -8,7 +8,7 @@
 # @author stev leibelt <artodeto@bazzline.net>
 ####
 
-Function Create-TruncableObject {
+Function New-TruncableObject {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
@@ -35,7 +35,7 @@ Function Create-TruncableObject {
     return $object
 }
 
-Function Create-LockFileOrExit {
+Function New-LockFileOrExit {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
@@ -62,7 +62,7 @@ Function Create-LockFileOrExit {
     Log-Debug $logFilePath "Lock file create, path >>${lockFilePath}<<, content >>${PID}<<" $beVerbose
 }
 
-Function Release-LockFile {
+Function Remove-LockFileOrExit {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
@@ -322,7 +322,7 @@ Function CleanUpSystem {
     $startDateTime = Get-Date
     $startDiskInformation = Create-DiskInformation
 
-    Create-LockFileOrExit $lockFilePath $logFilePath $beVerbose
+    New-LockFileOrExit $lockFilePath $logFilePath $beVerbose
 
     Log-DiskSpace $logFilePath $startDiskInformation $beVerbose
 
@@ -338,7 +338,7 @@ Function CleanUpSystem {
 
     Log-Statistics $logFilePath $statisticObject $beVerbose
 
-    Release-LockFile $lockFilePath $logFilePath $beVerbose
+    Remove-LockFileOrExit $lockFilePath $logFilePath $beVerbose
     #eo: clean up
 }
 
