@@ -219,7 +219,26 @@ Function Log-Diskspace {
     $freeSizeInPercentage = "{0:P1}" -f ( $logicalDisk.FreeSpace / $logicalDisk.Size )
 
     Log-Info $path "Drive: ${logicalDisk.DeviceID}, Total Size (GB) ${totalSizeInGB}, Free Size (GB} ${freeSizeInGB}, Free size in percentage ${freeSizeInPercentage}" $beVerbose
+
 }
+
+Function Log-Statistics {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$path,
+
+        [Parameter(Mandatory = $true)]
+        [DateTime]$runDateTime,
+
+        [Parameter(Mandatory = $false)]
+        [bool]$beVerbose = $false
+    )
+
+    Log-Info $path ":: Statistics ::" $beVerbose
+    Log-Info $path "   Runtime ${runDateTime.Hours} hours, ${runDateTime.Minutes} minutes, ${runDateTime.Seconds} seconds." $beVerbose
+}
+
 
 Function CleanUpSystem {
     #bo: variable definition
@@ -242,6 +261,8 @@ Function CleanUpSystem {
     #eo: variable definition
 
     #bo: clean up
+    $startDateTime = Get-Date
+
     Create-LockFileOrExit $lockFilePath $logFilePath $beVerbose
 
     Log-DiskSpace $logFilePath $beVerbose
@@ -249,6 +270,10 @@ Function CleanUpSystem {
     Truncate-Paths $collectionOfTruncableObjects $logFilePath $beVerbose
 
     Log-DiskSpace $logFilePath $beVerbose
+
+    $runDateTime = (Get-Date).Subtract($startDateTime)
+
+    Log-Statistics $logFilePath $beVerbose $runDateTime
 
     Release-LockFile $lockFilePath $logFilePath $beVerbose
     #eo: clean up
