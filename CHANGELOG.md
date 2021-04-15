@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### To Change
 
+* read [this](https://docs.microsoft.com/en-us/powershell/scripting/learn/deep-dives/everything-about-arrays?view=powershell-7.1)
+    * and [this](https://powershellexplained.com/2017-05-27-Powershell-module-building-basics/)
+    * and [this](https://docs.microsoft.com/en-us/powershell/scripting/developer/module/how-to-write-a-powershell-script-module?view=powershell-7.1)
 * Evaluate how easy it is to use the collection of paths and create full qualifyed paths out of it
     * This way we would be able to log and process real paths instead of paths with wild cards
     * e.g. `C:\foo\*.bar\*` would became `C:\foo\baz.bar` and maybe more
