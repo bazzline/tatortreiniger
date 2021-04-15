@@ -26,6 +26,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
         * Create object Logger and Messenger
         * Create MessengerCollection
         * Pass the MessengerCollection to each function
+* Version 2
+    * be open for all know operation systems (windows or unix/linux like)
+    * detect operation system
+        * create case blocks in the global configuration file
+        * adapt path handling and so one, if needed
 
 ## [Unreleased]
 
