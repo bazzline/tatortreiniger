@@ -31,6 +31,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
     * detect operation system
         * create case blocks in the global configuration file
         * adapt path handling and so one, if needed
+    * check if [this](http://woshub.com/how-to-clean-up-system-volume-information-folder/) is a thing
 
 ## [Unreleased]
 
