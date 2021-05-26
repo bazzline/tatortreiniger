@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### To Add
 
 * added default value `$false` to each optional parameter `$beVerbose`
+* add user remove logic from [windows_remove_old_users](https://github.com/stevleibelt/windows_remove_old_users)
 
 ### To Change
 
