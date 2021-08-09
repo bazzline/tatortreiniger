@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### To Add
 
+* add progressbar or information like "[7 / 12] users in progress"
 * added default value `$false` to each optional parameter `$beVerbose`
 * add user remove logic from [windows_remove_old_users](https://github.com/stevleibelt/windows_remove_old_users)
 * add configuration section with a list of processes to stop before starting the cleanup
