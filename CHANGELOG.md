@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### To Change
 
+* fix not working calculated values of free'ed up disk space by using [Measure-Object](http://woshub.com/powershell-get-folder-sizes/)
 * read [this](https://docs.microsoft.com/en-us/powershell/scripting/learn/deep-dives/everything-about-arrays?view=powershell-7.1)
     * and [this](https://powershellexplained.com/2017-05-27-Powershell-module-building-basics/)
     * and [this](https://docs.microsoft.com/en-us/powershell/scripting/developer/module/how-to-write-a-powershell-script-module?view=powershell-7.1)
