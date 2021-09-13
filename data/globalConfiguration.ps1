@@ -12,11 +12,11 @@
 #bo: general variable section
 $beVerbose = $false
 #$globalLogLevel = 0  #@see: https://docs.microsoft.com/en-us/dotnet/api/microsoft.extensions.logging.loglevel?view=dotnet-plat-ext-5.0
+$deleteRecycleBin = $false #you should use a GPO for this but if you can't just empty the trash bin on each run
 $isDryRun = $false
 $lockFilePath = ($PSScriptRoot + "\CleanUpSystem.lock")
 $logDirectoryPath = ($PSScriptRoot + "\log\")
-#if set to $true, cleanmgr will be started
-$startDiskCleanupManager = $true
+$startDiskCleanupManager = $true #if set to $true, cleanmgr will be started
 #eo: general variable section
 
 #bo: path section

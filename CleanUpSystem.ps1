@@ -256,6 +256,37 @@ Function Create-StatisticObject {
     return $object
 }
 
+Function Delete-RecycleBin {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string] $logFilePath,
+
+        [Parameter(Mandatory = $false)]
+        [bool] $beVerbose = $false
+    )
+
+    Write-InfoLog $logFilePath ":: Starting deletion of recycle bin." $beVerbose
+
+    $IsOlderThanWindowsServer2016 = ( [System.Environment]::OSVersion.Version.Major -lt 10 );
+
+    If ( $IsOlderThanWindowsServer2016 -eq $true ) {
+        If ($beVerbose -eq $true) {
+            Start-Process -FilePath rd -ArgumentList '/s' '/q' 'C:\$Recycle.Bin' -Wait
+        } Else {
+            Start-Process -FilePath rd -ArgumentList '/s' 'C:\$Recycle.Bin' -Wait
+        }
+    } Else {
+        If ($beVerbose -eq $true) {
+            Clear-RecycleBin -Force -Verbose
+        } Else {
+            Clear-RecycleBin -Force
+        }
+    }
+
+    Write-InfoLog $logFilePath ":: Finished deletion of recycle bin." $beVerbose
+}
+
 Function Write-DiskspaceLog {
     [CmdletBinding()]
     param(
@@ -333,6 +364,10 @@ Function Start-CleanUpSystem {
     $endDiskInformation = Create-DiskInformation
 
     $statisticObject = Create-StatisticObject $runDatetime $numberOfRemovedFileSystemObjects $startDiskInformation $endDiskInformation
+
+    If ($deleteRecycleBin -eq $true) {
+        Delete-RecycleBin $logFilePath $beVerbose
+    }
 
     If ($startDiskCleanupManager -eq $true) {
         Start-DiskCleanupManager $logFilePath $beVerbose

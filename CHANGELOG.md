@@ -43,6 +43,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
+* Added configuration value `$deleteRecycleBin` with default value `$false`
+    * Depending on the major os version, it runs `rd` or `Clear-RecycleBin`
 * Added configuration value `$startDiskCleanupManager` with default value `$true`
     * If set to `$true`, `cleanmgr /sagerun:1 /verylowdisk` will be executed
 * Added statistic output as information message on last line
