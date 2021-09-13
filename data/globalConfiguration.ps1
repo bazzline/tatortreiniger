@@ -15,6 +15,8 @@ $beVerbose = $false
 $isDryRun = $false
 $lockFilePath = ($PSScriptRoot + "\CleanUpSystem.lock")
 $logDirectoryPath = ($PSScriptRoot + "\log\")
+#if set to $true, cleanmgr will be started
+$startDiskCleanupManager = $true
 #eo: general variable section
 
 #bo: path section

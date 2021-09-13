@@ -334,12 +334,38 @@ Function Start-CleanUpSystem {
 
     $statisticObject = Create-StatisticObject $runDatetime $numberOfRemovedFileSystemObjects $startDiskInformation $endDiskInformation
 
+    If ($startDiskCleanupManager -eq $true) {
+        Start-DiskCleanupManager $logFilePath $beVerbose
+    }
+
     Write-DiskspaceLog $logFilePath $endDiskinformation $beVerbose
 
     Write-StatisticLog $logFilePath $statisticObject $beVerbose
 
     Remove-LockFileOrExit $lockFilePath $logFilePath $beVerbose
     #eo: clean up
+}
+
+Function Start-DiskCleanupManager {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string] $logFilePath,
+
+        [Parameter(Mandatory = $false)]
+        [bool] $beVerbose = $false
+    )
+
+    Write-InfoLog $logFilePath ":: Starting system disk cleanup manager." $beVerbose
+
+    #@see: https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/cleanmgr
+    If ($beVerbose -eq $true) {
+        Start-Process -FilePath Cleanmgr -ArgumentList '/sagerun:1' '/verylowdisk' -Wait -Verbose
+    } Else {
+        Start-Process -FilePath Cleanmgr -ArgumentList '/sagerun:1' '/verylowdisk' -Wait
+    }
+
+    Write-InfoLog $logFilePath ":: Finished system disk cleanup manager." $beVerbose
 }
 
 Function Start-PathTruncation {
@@ -364,7 +390,7 @@ Function Start-PathTruncation {
         [int]$numberOfRemovedFileSystemObjects,
 
         [Parameter(Mandatory = $false)]
-        [bool]$beVerbose,
+        [bool]$beVerbose = $false,
 
         [Parameter(Mandatory = $false)]
         [bool]$isDryRun = $false
@@ -469,10 +495,10 @@ Function Start-PathTruncations {
         [System.Collections.ArrayList]$collectionOfTruncableObjects,
 
         [Parameter(Mandatory = $true)]
-        [string]$logFilePath,
+        [string] $logFilePath,
 
         [Parameter(Mandatory = $false)]
-        [bool]$beVerbose
+        [bool] $beVerbose = $false
     )
 
     $listOfUserPaths = Get-ChildItem "C:\Users" | Select-Object Name
