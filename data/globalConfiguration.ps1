@@ -21,77 +21,77 @@ $startDiskCleanupManager = $true #if set to $true, cleanmgr will be started
 
 #bo: path section
 #  bo: system paths
-$collectionOfTruncableObjects.Add((Create-TruncableObject $logDirectoryPath 28)) | Out-Null
-$collectionOfTruncableObjects.Add((Create-TruncableObject "C:\Temp\*" 0)) | Out-Null
-#$collectionOfTruncableObjects.Add((Create-TruncableObject "C:\Windows\Temp\*" 0)) | Out-Null
-#$collectionOfTruncableObjects.Add((Create-TruncableObject "C:\Windows\Logs\*\*" 0)) | Out-Null
-$collectionOfTruncableObjects.Add((Create-TruncableObject "C:\ProgramData\Microsoft\Windows\WER\*" 0)) | Out-Null
-$collectionOfTruncableObjects.Add((Create-TruncableObject "C:\Windows\System32\LogFiles\*\*" 7)) | Out-Null
-$collectionOfTruncableObjects.Add((Create-TruncableObject "C:\Windows\SoftwareDistribution\*" 0)) | Out-Null
-$collectionOfTruncableObjects.Add((Create-TruncableObject "C:\Windows\logs\CBS\*.log" 0)) | Out-Null
+$collectionOfTruncableObjects.Add((New-TruncableObject $logDirectoryPath 28)) | Out-Null
+$collectionOfTruncableObjects.Add((New-TruncableObject "C:\Temp\*" 0)) | Out-Null
+#$collectionOfTruncableObjects.Add((New-TruncableObject "C:\Windows\Temp\*" 0)) | Out-Null
+#$collectionOfTruncableObjects.Add((New-TruncableObject "C:\Windows\Logs\*\*" 0)) | Out-Null
+$collectionOfTruncableObjects.Add((New-TruncableObject "C:\ProgramData\Microsoft\Windows\WER\*" 0)) | Out-Null
+$collectionOfTruncableObjects.Add((New-TruncableObject "C:\Windows\System32\LogFiles\*\*" 7)) | Out-Null
+$collectionOfTruncableObjects.Add((New-TruncableObject "C:\Windows\SoftwareDistribution\*" 0)) | Out-Null
+$collectionOfTruncableObjects.Add((New-TruncableObject "C:\Windows\logs\CBS\*.log" 0)) | Out-Null
 #  eo: system paths
 
 #  bo: different programm paths
 #iis logs
-$collectionOfTruncableObjects.Add((Create-TruncableObject "C:\inetpub\logs\LogFiles\*" 7)) | Out-Null
-$collectionOfTruncableObjects.Add((Create-TruncableObject "C:\Config.Msi" 0)) | Out-Null
-$collectionOfTruncableObjects.Add((Create-TruncableObject "C:\Intel" 0)) | Out-Null
-$collectionOfTruncableObjects.Add((Create-TruncableObject "C:\PerfLogs" 0)) | Out-Null
-$collectionOfTruncableObjects.Add((Create-TruncableObject "$env:windir\memory.dmp" 0)) | Out-Null
-$collectionOfTruncableObjects.Add((Create-TruncableObject "$env:windir\minidump\*" 0)) | Out-Null
-#$collectionOfTruncableObjects.Add((Create-TruncableObject "$env:windir\Prefetch\*" 0)) | Out-Null
+$collectionOfTruncableObjects.Add((New-TruncableObject "C:\inetpub\logs\LogFiles\*" 7)) | Out-Null
+$collectionOfTruncableObjects.Add((New-TruncableObject "C:\Config.Msi" 0)) | Out-Null
+$collectionOfTruncableObjects.Add((New-TruncableObject "C:\Intel" 0)) | Out-Null
+$collectionOfTruncableObjects.Add((New-TruncableObject "C:\PerfLogs" 0)) | Out-Null
+$collectionOfTruncableObjects.Add((New-TruncableObject "$env:windir\memory.dmp" 0)) | Out-Null
+$collectionOfTruncableObjects.Add((New-TruncableObject "$env:windir\minidump\*" 0)) | Out-Null
+#$collectionOfTruncableObjects.Add((New-TruncableObject "$env:windir\Prefetch\*" 0)) | Out-Null
 #  eo: different programm paths
 
 #  bo: mozilla firefox
-$collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\AppData\Local\Mozilla\Firefox\Profiles\*.default\cache\*' 0)) | Out-Null
-$collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\AppData\Local\Mozilla\Firefox\Profiles\*.default\cache2\entries\*' 0)) | Out-Null
-$collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\AppData\Local\Mozilla\Firefox\Profiles\*.default\thumbnails' 0)) | Out-Null
-$collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\AppData\Local\Mozilla\Firefox\Profiles\*.default\cookies.sqlite' 0)) | Out-Null
-$collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\AppData\Local\Mozilla\Firefox\Profiles\*.default\webappsstore.sqlite' 0)) | Out-Null
-$collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\AppData\Local\Mozilla\Firefox\Profiles\*.default\chromeappsstore.sqlite' 0)) | Out-Null
-$collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\AppData\Local\Mozilla\Firefox\Profiles\*.default\OfflineCache' 0)) | Out-Null
+$collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Local\Mozilla\Firefox\Profiles\*.default\cache\*' 0)) | Out-Null
+$collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Local\Mozilla\Firefox\Profiles\*.default\cache2\entries\*' 0)) | Out-Null
+$collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Local\Mozilla\Firefox\Profiles\*.default\thumbnails' 0)) | Out-Null
+$collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Local\Mozilla\Firefox\Profiles\*.default\cookies.sqlite' 0)) | Out-Null
+$collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Local\Mozilla\Firefox\Profiles\*.default\webappsstore.sqlite' 0)) | Out-Null
+$collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Local\Mozilla\Firefox\Profiles\*.default\chromeappsstore.sqlite' 0)) | Out-Null
+$collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Local\Mozilla\Firefox\Profiles\*.default\OfflineCache' 0)) | Out-Null
 #  eo: mozilla firefox
 
 #  bo: google chrome
-$collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\AppData\Local\Google\Chrome\User Data\*\Cache\*' 0)) | Out-Null
-$collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\AppData\Local\Google\Chrome\User Data\*\Cache2\entries\*' 0)) | Out-Null
-$collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\AppData\Local\Google\Chrome\User Data\*\Cookies' 0)) | Out-Null
-$collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\AppData\Local\Google\Chrome\User Data\*\Media Cache' 0)) | Out-Null
-$collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\AppData\Local\Google\Chrome\User Data\*\Cookies-Journal' 0)) | Out-Null
-$collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\AppData\Local\Google\Chrome\User Data\*\JumpListIconsOld' 0)) | Out-Null
+$collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Local\Google\Chrome\User Data\*\Cache\*' 0)) | Out-Null
+$collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Local\Google\Chrome\User Data\*\Cache2\entries\*' 0)) | Out-Null
+$collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Local\Google\Chrome\User Data\*\Cookies' 0)) | Out-Null
+$collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Local\Google\Chrome\User Data\*\Media Cache' 0)) | Out-Null
+$collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Local\Google\Chrome\User Data\*\Cookies-Journal' 0)) | Out-Null
+$collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Local\Google\Chrome\User Data\*\JumpListIconsOld' 0)) | Out-Null
 #  eo: google chrome
 
 #  bo: microsoft internet explorer and edge
-$collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\AppData\Local\Microsoft\Windows\IECompatCache\*' 0)) | Out-Null
-$collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\AppData\Local\Microsoft\Windows\IECompatUaCache\*' 0)) | Out-Null
-$collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\AppData\Local\Microsoft\Windows\IEDownloadHistory\*' 0)) | Out-Null
-$collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\AppData\Local\Microsoft\Windows\Temporary Internet Files\*' 0)) | Out-Null
-$collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\AppData\Local\Microsoft\Windows\INetCache\*' 0)) | Out-Null
-$collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\AppData\Local\Microsoft\Windows\INetCookies\*' 0)) | Out-Null
-$collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\AppData\Local\Microsoft\Terminal Server Client\Cache\*' 0)) | Out-Null
-$collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\AppData\Local\Microsoft\Windows\WebCache\*' 0)) | Out-Null
+$collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Local\Microsoft\Windows\IECompatCache\*' 0)) | Out-Null
+$collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Local\Microsoft\Windows\IECompatUaCache\*' 0)) | Out-Null
+$collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Local\Microsoft\Windows\IEDownloadHistory\*' 0)) | Out-Null
+$collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Local\Microsoft\Windows\Temporary Internet Files\*' 0)) | Out-Null
+$collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Local\Microsoft\Windows\INetCache\*' 0)) | Out-Null
+$collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Local\Microsoft\Windows\INetCookies\*' 0)) | Out-Null
+$collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Local\Microsoft\Terminal Server Client\Cache\*' 0)) | Out-Null
+$collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Local\Microsoft\Windows\WebCache\*' 0)) | Out-Null
 #  eo: microsoft internet explorer and edge
 
 #  bo: chromium
-$collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\AppData\Local\Chromium\User Data\Default\Cache\*' 0)) | Out-Null
-$collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\AppData\Local\Chromium\User Data\Default\GPUCache\*' 0)) | Out-Null
-$collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\AppData\Local\Chromium\User Data\Default\Media Cache' 0)) | Out-Null
-$collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\AppData\Local\Chromium\User Data\Default\Pepper Data' 0)) | Out-Null
-$collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\AppData\Local\Chromium\User Data\Default\Application Cache' 0)) | Out-Null
+$collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Local\Chromium\User Data\Default\Cache\*' 0)) | Out-Null
+$collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Local\Chromium\User Data\Default\GPUCache\*' 0)) | Out-Null
+$collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Local\Chromium\User Data\Default\Media Cache' 0)) | Out-Null
+$collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Local\Chromium\User Data\Default\Pepper Data' 0)) | Out-Null
+$collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Local\Chromium\User Data\Default\Application Cache' 0)) | Out-Null
 #  eo: chromium
 
 #  bo: user temp folder
-$collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\AppData\Local\Temp\*' 0)) | Out-Null
-$collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\AppData\Local\Microsoft\Windows\WER\*' 0)) | Out-Null
-$collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\AppData\Local\Microsoft\Windows\AppCache\' 0)) | Out-Null
-$collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\AppData\Local\Microsoft\Windows\Temporary Internet Files\*' 0)) | Out-Null
-$collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\AppData\Local\CrashDumps\*' 0)) | Out-Null
-$collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\AppData\Roaming\Adobe\Flash Player\*' 0)) | Out-Null
-$collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\AppData\Roaming\Macromedia\Flash Player\*' 0)) | Out-Null
-$collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\AppData\Roaming\Microsoft\Windows\Recent\*' 0)) | Out-Null
-$collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\AppData\Adobe\Flash Player\*' 0)) | Out-Null
-$collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\AppData\Macromedia\Flash Player\*' 0)) | Out-Null
-$collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\AppData\Sun\Java\*' 0)) | Out-Null
+$collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Local\Temp\*' 0)) | Out-Null
+$collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Local\Microsoft\Windows\WER\*' 0)) | Out-Null
+$collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Local\Microsoft\Windows\AppCache\' 0)) | Out-Null
+$collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Local\Microsoft\Windows\Temporary Internet Files\*' 0)) | Out-Null
+$collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Local\CrashDumps\*' 0)) | Out-Null
+$collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Roaming\Adobe\Flash Player\*' 0)) | Out-Null
+$collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Roaming\Macromedia\Flash Player\*' 0)) | Out-Null
+$collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Roaming\Microsoft\Windows\Recent\*' 0)) | Out-Null
+$collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Adobe\Flash Player\*' 0)) | Out-Null
+$collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Macromedia\Flash Player\*' 0)) | Out-Null
+$collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Sun\Java\*' 0)) | Out-Null
 #  eo: user temp folder
 
 #  bo: user general

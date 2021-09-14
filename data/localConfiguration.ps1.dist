@@ -26,12 +26,12 @@
 #
 #Example:
 #   Following is a example without real data, you see the expected type and if it is mandatory or optional and default values
-#   $collectionOfTruncableObjects.Add((Create-TruncableObject <string: path> [<int: days to keep old files = 1] [<bool: check for duplicates = $false] [<int: check for duplicates greater than megabyte = 64])) | Out-Null
+#   $collectionOfTruncableObjects.Add((New-TruncableObject <string: path> [<int: days to keep old files = 1] [<bool: check for duplicates = $false] [<int: check for duplicates greater than megabyte = 64])) | Out-Null
 #
 #   Following is an example with real data
-#   $collectionOfTruncableObjects.Add((Create-TruncableObject 'C:\Users\$user\...' 7 $true 32)) | Out-Null
+#   $collectionOfTruncableObjects.Add((New-TruncableObject 'C:\Users\$user\...' 7 $true 32)) | Out-Null
 ####
 #  bo: user general
-#$collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\Downloads' 21 $true 32)) | Out-Null
+#$collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\Downloads' 21 $true 32)) | Out-Null
 #  eo: user general
 #eo: path section

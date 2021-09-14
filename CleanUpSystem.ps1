@@ -9,7 +9,30 @@
 # @author stev leibelt <artodeto@bazzline.net>
 ####
 
-Function New-TruncableObject {
+Function Create-TruncableObject
+{
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$path,
+
+        [Parameter(Mandatory = $false)]
+        [int]$daysToKeepOldFiles = 1,
+
+        [Parameter(Mandatory = $false)]
+        [bool]$checkForDuplicates = $false,
+
+        [Parameter(Mandatory = $false)]
+        [int]$checkForDuplicatesGreaterThanMegabyte = 64
+    )
+
+    Write-Host ":: Please update your configuration. >>Create-TruncableObject<< is deprecarted and has to be replaced with >>New-TruncableObject<<. This function will be deleted at 31.12.2021."
+
+    New-TruncableObject $path $daysToKeepOldFiles $checkForDuplicates $checkForDuplicatesGreaterThanMegabyte
+}
+
+Function New-TruncableObject
+{
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
@@ -309,7 +332,8 @@ Function Write-DiskspaceLog {
     
 }
 
-Function Write-StatisticLog {
+Function Write-StatisticLog
+{
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
@@ -332,7 +356,8 @@ Function Write-StatisticLog {
 }
 
 
-Function Start-CleanUpSystem {
+Function Start-CleanUpSystem
+{
     #bo: variable definition
     $currentDate = Get-Date -Format "yyyyMMdd"
     $collectionOfTruncableObjects = New-Object System.Collections.ArrayList
