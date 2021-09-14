@@ -43,6 +43,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
+* Added optional local host configuration `local-<hostname>-Configuration.ps1`
 * Added configuration value `$deleteRecycleBin` with default value `$false`
     * Depending on the major os version, it runs `rd` or `Clear-RecycleBin`
 * Added configuration value `$startDiskCleanupManager` with default value `$true`
@@ -58,6 +59,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 
 * Changed function names to aligne with [approved verbs](https://docs.microsoft.com/de-de/powershell/scripting/developer/cmdlet/approved-verbs-for-windows-powershell-commands?view=powershell-7.1)
+* Changed lock file name from `CleanUpSystem.lock` to `<hostname>-CleanUpSystem.lock` to enable multiple run on multiple hosts from same source
 * Refactored method naming to fit the style of powershell
     * IMPORTANT, you have to replace the `Create-TruncableObject` method calls in your local configuration with `New-TruncableObject`
 

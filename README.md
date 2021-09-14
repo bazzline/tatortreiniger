@@ -17,6 +17,7 @@ You can run the [start_clean_up_system.bat](start_clean_up_system.bat) right awa
 
 If you want to configure anything, you should copy the [localConfiguration.ps1.dist](data/localConfiguration.ps1.dist) as `localConfiguration.ps1` in the [data](data) path.
 You can enable verbosity or log level in the local configuration. And of course, you can add more paths for the clean up system itself.
+If you want to configure anything per host basis but keep it in the same path, you can create a file like `local-<hostname>-Configuration.ps1` in the [data](data) path.
 
 For each path, you can configure if you want to keep files older than x days. Furthermore, you can run a duplicate check, based on file hashs, and restrict to only bigger files.
 This script comes with a bit of magic. If you put it `$user` in a path, the script will replace this with all available users it can find below `C:\Users\`.
