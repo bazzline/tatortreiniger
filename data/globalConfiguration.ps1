@@ -36,9 +36,9 @@ $collectionOfTruncableObjects.Add((New-TruncableObject "C:\Windows\logs\CBS\*.lo
 $collectionOfTruncableObjects.Add((New-TruncableObject "C:\inetpub\logs\LogFiles\*" 7)) | Out-Null
 $collectionOfTruncableObjects.Add((New-TruncableObject "C:\Config.Msi" 0)) | Out-Null
 $collectionOfTruncableObjects.Add((New-TruncableObject "C:\Intel" 0)) | Out-Null
-$collectionOfTruncableObjects.Add((New-TruncableObject "C:\PerfLogs" 0)) | Out-Null
-$collectionOfTruncableObjects.Add((New-TruncableObject "$env:windir\memory.dmp" 0)) | Out-Null
-$collectionOfTruncableObjects.Add((New-TruncableObject "$env:windir\minidump\*" 0)) | Out-Null
+#$collectionOfTruncableObjects.Add((New-TruncableObject "C:\PerfLogs" 0)) | Out-Null
+#$collectionOfTruncableObjects.Add((New-TruncableObject "$env:windir\memory.dmp" 0)) | Out-Null
+#$collectionOfTruncableObjects.Add((New-TruncableObject "$env:windir\minidump\*" 0)) | Out-Null
 #$collectionOfTruncableObjects.Add((New-TruncableObject "$env:windir\Prefetch\*" 0)) | Out-Null
 #  eo: different programm paths
 
