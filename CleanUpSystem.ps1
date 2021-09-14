@@ -4,6 +4,7 @@
 ####
 # @see:
 #   https://github.com/Bromeego/Clean-Temp-Files/blob/master/Clear-TempFiles.ps1
+#   https://gist.github.com/synikil/47784f432979d97e5dc1181349e1e591
 # @since 2021-04-06
 # @author stev leibelt <artodeto@bazzline.net>
 ####
@@ -202,7 +203,9 @@ Function Write-ErrorLog {
     Write-LogMessage $path $message 4 $beVerbose
 }
 
-Function Create-DiskInformation {
+Function Create-DiskInformation 
+{
+
     $logicalDisk = Get-WmiObject Win32_LogicalDisk | Where-Object { $_.DriveType -eq "3" }
 
     $totalSizeInGB = "{0:N1}" -f ( $logicalDisk.Size / 1gb)
@@ -350,20 +353,18 @@ Function Start-CleanUpSystem {
     #eo: variable definition
 
     #bo: clean up
-    $startDateTime = Get-Date
+    $startDateTime = (Get-Date)
     $startDiskInformation = Create-DiskInformation
 
     New-LockFileOrExit $lockFilePath $logFilePath $beVerbose
 
     Write-DiskspaceLog $logFilePath $startDiskInformation $beVerbose
 
+    #disable windows update service to enable cleanup of >>c:\windows\softwaredistribution<<
+    Get-Service -Name wuauserv | Stop-Service -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue -Verbose
+
+    #  bo: manipulating the file system
     $numberOfRemovedFileSystemObjects = Start-PathTruncations $collectionOfTruncableObjects $logFilePath $beVerbose
-
-    $runDateTime = (Get-Date).Subtract($startDateTime)
-
-    $endDiskInformation = Create-DiskInformation
-
-    $statisticObject = Create-StatisticObject $runDatetime $numberOfRemovedFileSystemObjects $startDiskInformation $endDiskInformation
 
     If ($deleteRecycleBin -eq $true) {
         Delete-RecycleBin $logFilePath $beVerbose
@@ -372,10 +373,20 @@ Function Start-CleanUpSystem {
     If ($startDiskCleanupManager -eq $true) {
         Start-DiskCleanupManager $logFilePath $beVerbose
     }
+    #  eo: manipulating the file system
+
+    $runDateTime = (Get-Date).Subtract($startDateTime)
+
+    $endDiskInformation = Create-DiskInformation
+
+    $statisticObject = Create-StatisticObject $runDatetime $numberOfRemovedFileSystemObjects $startDiskInformation $endDiskInformation
 
     Write-DiskspaceLog $logFilePath $endDiskinformation $beVerbose
 
     Write-StatisticLog $logFilePath $statisticObject $beVerbose
+
+    #enable windows update service
+    Get-Service -Name wuauserv | Start-Service -ErrorAction SilentlyContinue
 
     Remove-LockFileOrExit $lockFilePath $logFilePath $beVerbose
     #eo: clean up

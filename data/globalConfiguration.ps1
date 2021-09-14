@@ -27,7 +27,20 @@ $collectionOfTruncableObjects.Add((Create-TruncableObject "C:\Temp\*" 0)) | Out-
 #$collectionOfTruncableObjects.Add((Create-TruncableObject "C:\Windows\Logs\*\*" 0)) | Out-Null
 $collectionOfTruncableObjects.Add((Create-TruncableObject "C:\ProgramData\Microsoft\Windows\WER\*" 0)) | Out-Null
 $collectionOfTruncableObjects.Add((Create-TruncableObject "C:\Windows\System32\LogFiles\*\*" 7)) | Out-Null
+$collectionOfTruncableObjects.Add((Create-TruncableObject "C:\Windows\SoftwareDistribution\*" 0)) | Out-Null
+$collectionOfTruncableObjects.Add((Create-TruncableObject "C:\Windows\logs\CBS\*.log" 0)) | Out-Null
 #  eo: system paths
+
+#  bo: different programm paths
+#iis logs
+$collectionOfTruncableObjects.Add((Create-TruncableObject "C:\inetpub\logs\LogFiles\*" 7)) | Out-Null
+$collectionOfTruncableObjects.Add((Create-TruncableObject "C:\Config.Msi" 0)) | Out-Null
+$collectionOfTruncableObjects.Add((Create-TruncableObject "C:\Intel" 0)) | Out-Null
+$collectionOfTruncableObjects.Add((Create-TruncableObject "C:\PerfLogs" 0)) | Out-Null
+$collectionOfTruncableObjects.Add((Create-TruncableObject "$env:windir\memory.dmp" 0)) | Out-Null
+$collectionOfTruncableObjects.Add((Create-TruncableObject "$env:windir\minidump\*" 0)) | Out-Null
+#$collectionOfTruncableObjects.Add((Create-TruncableObject "$env:windir\Prefetch\*" 0)) | Out-Null
+#  eo: different programm paths
 
 #  bo: mozilla firefox
 $collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\AppData\Local\Mozilla\Firefox\Profiles\*.default\cache\*' 0)) | Out-Null
@@ -49,8 +62,13 @@ $collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\AppDat
 #  eo: google chrome
 
 #  bo: microsoft internet explorer and edge
+$collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\AppData\Local\Microsoft\Windows\IECompatCache\*' 0)) | Out-Null
+$collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\AppData\Local\Microsoft\Windows\IECompatUaCache\*' 0)) | Out-Null
+$collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\AppData\Local\Microsoft\Windows\IEDownloadHistory\*' 0)) | Out-Null
 $collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\AppData\Local\Microsoft\Windows\Temporary Internet Files\*' 0)) | Out-Null
 $collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\AppData\Local\Microsoft\Windows\INetCache\*' 0)) | Out-Null
+$collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\AppData\Local\Microsoft\Windows\INetCookies\*' 0)) | Out-Null
+$collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\AppData\Local\Microsoft\Terminal Server Client\Cache\*' 0)) | Out-Null
 $collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\AppData\Local\Microsoft\Windows\WebCache\*' 0)) | Out-Null
 #  eo: microsoft internet explorer and edge
 
@@ -66,6 +84,7 @@ $collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\AppDat
 $collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\AppData\Local\Temp\*' 0)) | Out-Null
 $collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\AppData\Local\Microsoft\Windows\WER\*' 0)) | Out-Null
 $collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\AppData\Local\Microsoft\Windows\AppCache\' 0)) | Out-Null
+$collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\AppData\Local\Microsoft\Windows\Temporary Internet Files\*' 0)) | Out-Null
 $collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\AppData\Local\CrashDumps\*' 0)) | Out-Null
 $collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\AppData\Roaming\Adobe\Flash Player\*' 0)) | Out-Null
 $collectionOfTruncableObjects.Add((Create-TruncableObject 'c:\Users\$user\AppData\Roaming\Macromedia\Flash Player\*' 0)) | Out-Null

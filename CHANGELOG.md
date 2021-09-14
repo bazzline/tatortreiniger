@@ -47,6 +47,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
     * Depending on the major os version, it runs `rd` or `Clear-RecycleBin`
 * Added configuration value `$startDiskCleanupManager` with default value `$true`
     * If set to `$true`, `cleanmgr /sagerun:1 /verylowdisk` will be executed
+* Added more paths plus handling of wsus service
 * Added statistic output as information message on last line
     * Runtime
     * Number of free-ed up disk space
