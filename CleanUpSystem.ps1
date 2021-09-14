@@ -467,8 +467,10 @@ Function Start-PathTruncation {
         [bool]$isDryRun = $false
     )
 
-    #if path ends with >>\*<<
+    
     $processPath = $true
+
+    #if path ends with >>\*<<
     If ($path -match '\\\*$') {
         $pathWithoutWildCard = $path.Substring(0,$path.Length-1)
 
@@ -478,6 +480,11 @@ Function Start-PathTruncation {
                 Write-InfoLog $logFilePath "Path does not exist >>${path}<<. Skipping it." $beVerbose
                 $processPath = $false
             }
+        }
+    } Else {
+        If (!(Test-Path $path)) {
+            Write-InfoLog $logFilePath "Path does not exist >>${path}<<. Skipping it." $beVerbose
+            $processPath = $false
         }
     }
 
