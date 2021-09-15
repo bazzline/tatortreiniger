@@ -591,17 +591,25 @@ Function Start-PathTruncations {
     $listOfUserPaths = Get-ChildItem "C:\Users" | Select-Object Name
     $listOfUserNames = $listOfUserPaths.Name
     $numberOfRemovedFileSystemObjects = 0
+    $TotalAmountOfTruncableObjects = $collectionOfTruncableObjects.Count
+    $CurrentTruncableObjectCounter = 0
 
     ForEach ($currentObject In $collectionOfTruncableObjects) {
+
+        $CurrentObjectPath = $currentObject.path
+
+        If ($beVerbose -ne $true) {
+            Write-Progress -Activity ":: Processing list of truncable objects." -Status "[${CurrentTruncableObjectCounter} / ${TotalAmountOfTruncableObjects}]" -PercentComplete (($CurrentTruncableObjectCounter / $TotalAmountOfTruncableObjects) * 100) -CurrentOperation "   Processing path >>${CurrentObjectPath}<<"
+        }
         #check if path ends with a wildcard
-        If ($currentObject.path -match '\$user') {
+        If ($CurrentObjectPath -match '\$user') {
             ForEach ($currentUserName In $listOfUserNames) {
-                $currentUserDirectryPath = $currentObject.path -replace '\$user', $currentUserName
+                $currentUserDirectoryPath = $CurrentObjectPath -replace '\$user', $currentUserName
                
-                $numberOfRemovedFileSystemObjects = Start-PathTruncation $currentUserDirectryPath $currentObject.days_to_keep_old_file $currentObject.check_for_duplicates $currentObject.check_for_duplicates_greater_than_megabyte $logFilePath $numberOfRemovedFileSystemObjects $beVerbose $isDryRun
+                $numberOfRemovedFileSystemObjects = Start-PathTruncation $currentUserDirectoryPath $currentObject.days_to_keep_old_file $currentObject.check_for_duplicates $currentObject.check_for_duplicates_greater_than_megabyte $logFilePath $numberOfRemovedFileSystemObjects $beVerbose $isDryRun
             }
         } Else {
-            $numberOfRemovedFileSystemObjects = Start-PathTruncation $currentObject.path $currentObject.days_to_keep_old_file $currentObject.check_for_duplicates $currentObject.check_for_duplicates_greater_than_megabyte $logFilePath $numberOfRemovedFileSystemObjects $beVerbose $isDryRun
+            $numberOfRemovedFileSystemObjects = Start-PathTruncation $CurrentObjectPath $currentObject.days_to_keep_old_file $currentObject.check_for_duplicates $currentObject.check_for_duplicates_greater_than_megabyte $logFilePath $numberOfRemovedFileSystemObjects $beVerbose $isDryRun
         }
     }
 
