@@ -10,6 +10,10 @@ This Skript is currently tested on:
 * Windows Server 2012 R2 - Version 6.3 (Build 9600)
 * Windows 10 - Version 20H2 (Build 19042.870)
 
+## Something for the mood
+
+![Screenshot of an execution.](documentation/image/20210915_cli.png "Tatortreiniger in action")
+
 ## Configuration and using it
 
 This script comes out of the box in a "ready to execute" way.
