@@ -441,9 +441,9 @@ Function Start-DiskCleanupManager {
 
     #@see: https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/cleanmgr
     If ($beVerbose -eq $true) {
-        Start-Process -FilePath Cleanmgr -ArgumentList '/sagerun:1' '/verylowdisk' -Wait -Verbose
+        Start-Process -FilePath Cleanmgr -ArgumentList '/sagerun:1', '/VERYLOWDISK' -Wait -Verbose
     } Else {
-        Start-Process -FilePath Cleanmgr -ArgumentList '/sagerun:1' '/verylowdisk' -Wait
+        Start-Process -FilePath Cleanmgr -ArgumentList '/sagerun:1', '/verylowdisk' -Wait
     }
 
     Write-InfoLog $logFilePath ":: Finished system disk cleanup manager." $beVerbose
