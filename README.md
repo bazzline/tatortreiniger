@@ -14,6 +14,8 @@ This Skript is currently tested on:
 
 ![Screenshot of an execution.](documentation/image/20210915_cli.png "Tatortreiniger in action")
 
+![Screenshot of some logged lines.](documentation/image/20210915_log.png "Tatortreiniger log file example")
+
 ## Configuration and using it
 
 This script comes out of the box in a "ready to execute" way.
