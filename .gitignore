@@ -1,3 +1,4 @@
 data/localConfiguration.ps1
+data/local*Configuration.ps1
 data/*.lock
 data/log/*.log
