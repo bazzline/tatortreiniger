@@ -593,12 +593,17 @@ Function Start-PathTruncations {
     $numberOfRemovedFileSystemObjects = 0
     $TotalAmountOfTruncableObjects = $collectionOfTruncableObjects.Count
     $CurrentTruncableObjectCounter = 0
+    $DisplayProgressBar = ($beVerbose -ne $true)
+
+    If ($DisplayProgressBar -eq $true) {
+        Clear-Host
+    }
 
     ForEach ($currentObject In $collectionOfTruncableObjects) {
 
         $CurrentObjectPath = $currentObject.path
 
-        If ($beVerbose -ne $true) {
+        If ($DisplayProgressBar -eq $true) {
             Write-Progress -Activity ":: Processing list of truncable objects." -Status "[${CurrentTruncableObjectCounter} / ${TotalAmountOfTruncableObjects}]" -PercentComplete (($CurrentTruncableObjectCounter / $TotalAmountOfTruncableObjects) * 100) -CurrentOperation "   Processing path >>${CurrentObjectPath}<<"
         }
         #check if path ends with a wildcard
@@ -611,6 +616,8 @@ Function Start-PathTruncations {
         } Else {
             $numberOfRemovedFileSystemObjects = Start-PathTruncation $CurrentObjectPath $currentObject.days_to_keep_old_file $currentObject.check_for_duplicates $currentObject.check_for_duplicates_greater_than_megabyte $logFilePath $numberOfRemovedFileSystemObjects $beVerbose $isDryRun
         }
+
+        ++$CurrentTruncableObjectCounter
     }
 
     Return $numberOfRemovedFileSystemObjects
