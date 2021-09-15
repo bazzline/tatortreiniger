@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### To Add
 
+* add usage of [transcript](https://www.tutorialspoint.com/how-to-use-a-transcript-in-powershell)
 * add progressbar or information like "[7 / 12] users in progress"
 * add translation files
 * added default value `$false` to each optional parameter `$beVerbose`
@@ -43,6 +44,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
+* Added asking ":: Remove lock file (y/N)" if lock file exists
 * Added optional local host configuration `local-<hostname>-Configuration.ps1`
 * Added configuration value `$deleteRecycleBin` with default value `$false`
     * Depending on the major os version, it runs `rd` or `Clear-RecycleBin`

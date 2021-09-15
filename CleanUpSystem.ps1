@@ -73,11 +73,21 @@ Function New-LockFileOrExit {
     )
 
     If (Test-Path $lockFilePath) {
-        Write-Error ":: Error"
-        Write-Error "   Could not aquire lock, lock file >>${lockFilePath}<< exists."
-        Write-ErrorLog $logFilePath "Could not aquire lock. Lock file >>${lockFilePath}<< exists." $beVerbose
 
-        Exit 1
+        Write-Host ":: Lock file exists. Maybe an previous run was stopped or is crashed."
+        $YesOrNo = Read-Host -Prompt "   Should I remove it? (y|N)"
+
+        If ($YesOrNo.StartsWith("y") -eq $true) {
+            Write-DebugLog $logFilePath "Removing existing lock file >>${lockFilePath}<< after asking the user." $beVerbose
+
+            Remove-Item -Path $lockFilePath
+        } Else {
+            Write-Error ":: Error"
+            Write-Error "   Could not aquire lock, lock file >>${lockFilePath}<< exists."
+            Write-ErrorLog $logFilePath "Could not aquire lock. Lock file >>${lockFilePath}<< exists." $beVerbose
+
+            Exit 1
+        }
     }
 
     New-Item -ItemType File $lockFilePath
@@ -466,8 +476,7 @@ Function Start-PathTruncation {
         [Parameter(Mandatory = $false)]
         [bool]$isDryRun = $false
     )
-
-    
+        
     $processPath = $true
 
     #if path ends with >>\*<<
