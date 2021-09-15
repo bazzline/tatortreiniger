@@ -43,6 +43,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
+### Changed
+
+## [0.11.0](https://github.com/bazzline/tatortreiniger/tree/0.11.0) - released at 20210915
+
+### Added
+
 * Added display of progress bar if `$beVerbose = $false`
 * Added asking ":: Remove lock file (y/N)" if lock file exists
 * Added optional local host configuration `local-<hostname>-Configuration.ps1`
