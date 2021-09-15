@@ -476,8 +476,10 @@ Function Start-PathTruncation {
         [Parameter(Mandatory = $false)]
         [bool]$isDryRun = $false
     )
-        
+
+    $DisplayProgessBar = ($beVerbose -ne $true)
     $processPath = $true
+    $ProcessedFileItemCounter = 1
 
     #if path ends with >>\*<<
     If ($path -match '\\\*$') {
@@ -509,8 +511,12 @@ Function Start-PathTruncation {
             $numberOfItemsToRemove = $matchingItems.Count
 
             Write-InfoLog $logFilePath "   Removing >>${numberOfItemsToRemove}<< entries." $beVerbose
-            
+
             ForEach ($matchingItem In $matchingItems) {
+                If ($DisplayProgessBar -eq $true){
+                    Write-Progress -Activity ":: Removing items." -Status "[${ProcessedFileItemCounter} / ${numberOfItemsToRemove}]" -PercentComplete (($ProcessedFileItemCounter / $numberOfItemsToRemove) * 100) -Id 1 -ParentId 0
+                    ++$ProcessedFileItemCounter
+                }
                 Write-DebugLog $logFilePath "   Trying to remove item >>${matchingItem}<<." $beVerbose
 
                 If (!$isDryRun) {
@@ -524,7 +530,11 @@ Function Start-PathTruncation {
             $matchingItems = Get-ChildItem -Path "$path" -Recurse -ErrorAction SilentlyContinue
 
             $numberOfItemsToRemove = $matchingItems.Count
-
+            
+            If (($DisplayProgessBar -eq $true) -and ($numberOfItemsToRemove -gt 0)){
+                Write-Progress -Activity ":: Removing items." -Status "[${ProcessedFileItemCounter} / ${numberOfItemsToRemove}]" -PercentComplete (($ProcessedFileItemCounter / $numberOfItemsToRemove) * 100) -Id 1 -ParentId 0
+                ++$ProcessedFileItemCounter
+            }
             Write-InfoLog $logFilePath "   Removing >>${numberOfItemsToRemove}<< entries." $beVerbose
             
             If (!$isDryRun) {
@@ -550,6 +560,11 @@ Function Start-PathTruncation {
                     $fileHashObject = Get-FileHash -Path "$path\$matchingItem" -Algorithm MD5
 
                     $fileHash = $fileHashObject.Hash
+
+                    If ($DisplayProgessBar -eq $true){
+                        Write-Progress -Activity ":: Removing items." -Status "[${ProcessedFileItemCounter} / ${numberOfItemsToRemove}]" -PercentComplete (($ProcessedFileItemCounter / $numberOfItemsToRemove) * 100) -Id 1 -ParentId 0
+                        ++$ProcessedFileItemCounter
+                    }
 
                     If ($listOfFileHashToFilePath.ContainsKey($fileHash)) {
                         Write-DebugLog $logFilePath "   Found duplicated hash >>${fileHash}<<, removing >>${path}\${matchingItem}<<." $beVerbose
@@ -604,7 +619,7 @@ Function Start-PathTruncations {
         $CurrentObjectPath = $currentObject.path
 
         If ($DisplayProgressBar -eq $true) {
-            Write-Progress -Activity ":: Processing list of truncable objects." -Status "[${CurrentTruncableObjectCounter} / ${TotalAmountOfTruncableObjects}]" -PercentComplete (($CurrentTruncableObjectCounter / $TotalAmountOfTruncableObjects) * 100) -CurrentOperation "   Processing path >>${CurrentObjectPath}<<"
+            Write-Progress -Activity ":: Processing list of truncable objects." -Status "[${CurrentTruncableObjectCounter} / ${TotalAmountOfTruncableObjects}]" -PercentComplete (($CurrentTruncableObjectCounter / $TotalAmountOfTruncableObjects) * 100) -CurrentOperation "   Processing path >>${CurrentObjectPath}<<" -Id 0
         }
         #check if path ends with a wildcard
         If ($CurrentObjectPath -match '\$user') {
