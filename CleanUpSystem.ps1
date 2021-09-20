@@ -557,28 +557,35 @@ Function Start-PathTruncation {
                 Write-InfoLog $logFilePath "   Checking >>${numberOfItemsToRemove}<< entries of being duplicates." $beVerbose
 
                 ForEach ($matchingItem In $matchingItems) {
-                    $fileHashObject = Get-FileHash -Path "$path\$matchingItem" -Algorithm MD5
+                    $filePathToMatchingItem = $("${path}\${matchingItem}")
+                    Write-DebugLog $logFilePath "   Processing matching item file path >>${filePathToMatchingItem}<<." $beVerbose
 
-                    $fileHash = $fileHashObject.Hash
+                    If (Test-Path -Path $filePathToMatchingItem) {
+                        $fileHashObject = Get-FileHash -Path "$filePathToMatchingItem" -Algorithm SHA256
 
-                    If ($DisplayProgessBar -eq $true){
-                        Write-Progress -Activity ":: Removing items." -Status "[${ProcessedFileItemCounter} / ${numberOfItemsToRemove}]" -PercentComplete (($ProcessedFileItemCounter / $numberOfItemsToRemove) * 100) -Id 1 -ParentId 0
-                        ++$ProcessedFileItemCounter
-                    }
+                        $fileHash = $fileHashObject.Hash
 
-                    If ($listOfFileHashToFilePath.ContainsKey($fileHash)) {
-                        Write-DebugLog $logFilePath "   Found duplicated hash >>${fileHash}<<, removing >>${path}\${matchingItem}<<." $beVerbose
+                        If ($DisplayProgessBar -eq $true){
+                            Write-Progress -Activity ":: Removing items." -Status "[${ProcessedFileItemCounter} / ${numberOfItemsToRemove}]" -PercentComplete (($ProcessedFileItemCounter / $numberOfItemsToRemove) * 100) -Id 1 -ParentId 0
+                            ++$ProcessedFileItemCounter
+                        }
 
-                        If (!$isDryRun) {
-                            Write-DebugLog $logFilePath "   Trying to remove item >>${path}\${matchingItem}<<." $beVerbose
+                        If ($listOfFileHashToFilePath.ContainsKey($fileHash)) {
+                            Write-DebugLog $logFilePath "   Found duplicated hash >>${fileHash}<<, removing >>${filePathToMatchingItem}<<." $beVerbose
 
-                            Remove-Item -Path "$path\$matchingItem" -Force -ErrorAction SilentlyContinue
-                            ++$numberOfRemovedFileSystemObjects
+                            If (!$isDryRun) {
+                                Write-DebugLog $logFilePath "   Trying to remove item >>${filePathToMatchingItem}<<." $beVerbose
+
+                                Remove-Item -Path "$filePathToMatchingItem" -Force -ErrorAction SilentlyContinue
+                                ++$numberOfRemovedFileSystemObjects
+                            }
+                        } Else {
+                            Write-DebugLog $logFilePath "   Adding key >>${fileHash}<< with value >>${matchingItem}<<." $beVerbose
+
+                            $listOfFileHashToFilePath.Add($fileHash, $matchingItem)
                         }
                     } Else {
-                        Write-DebugLog $logFilePath "   Adding key >>${fileHash}<< with value >>${matchingItem}<<." $beVerbose
-
-                        $listOfFileHashToFilePath.Add($fileHash, $matchingItem)
+                        Write-DebugLog $logFilePath "      Filepath is not valid." $beVerbose
                     }
                 }
             } Else {

@@ -43,9 +43,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
-* started section [documentation](documentation) and added example image to show something
+* Added check if matching item file path is valid to prevent >>Remove-Item : An Object with the give path ... does not exist<< error
+* Started section [documentation](documentation) and added example image to show something
 
 ### Changed
+
+* Changed file hashing algorithm from >>md5<< to >>sha256<<
 
 ## [0.11.0](https://github.com/bazzline/tatortreiniger/tree/0.11.0) - released at 20210915
 
