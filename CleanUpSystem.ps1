@@ -336,7 +336,8 @@ Function Write-DiskspaceLog {
         [bool]$beVerbose = $false
     )
 
-    $message = "Drive: {0}, Total Size (GB) {1}, Free Size (GB) {2}, Free size in percentage {3}" -f $diskInformation.device_id, $diskInformation.total_size_in_gb, $diskInformation.free_size_in_gb, $diskInformation.free_size_in_percentage
+    $message = "Drive: {0}, Total Size (GB) {1}, Free Size (GB) {2}, Free size in percentage {3}" `
+        -f $diskInformation.device_id, $diskInformation.total_size_in_gb, $diskInformation.free_size_in_gb, $diskInformation.free_size_in_percentage
 
     Write-InfoLog $path $message $beVerbose
     
@@ -358,10 +359,12 @@ Function Write-StatisticLog
 
     Write-InfoLog $path ":: Statistics ::" $beVerbose
 
-    $message = "   Runtime: Hours >>{0}<<, Minutes >>{1}<<, Seconds >>{2}<<." -f $statisticObject.runtime.hours, $statisticObject.runtime.minutes, $statisticObject.runtime.seconds
+    $message = "   Runtime: Hours >>{0}<<, Minutes >>{1}<<, Seconds >>{2}<<." `
+        -f $statisticObject.runtime.hours, $statisticObject.runtime.minutes, $statisticObject.runtime.seconds
     Write-InfoLog $path $message $beVerbose
 
-    $message = "   Freed up disk space >>{0}<< Number of removed file system objects >>{1}<<." -f $statisticObject.disk.freed_up_disk_space, $statisticObject.disk.number_of_removed_file_system_objects
+    $message = "   Freed up disk space >>{0}<< Number of removed file system objects >>{1}<<." `
+        -f $statisticObject.disk.freed_up_disk_space, $statisticObject.disk.number_of_removed_file_system_objects
     Write-InfoLog $path $message $beVerbose
 }
 
@@ -506,7 +509,8 @@ Function Start-PathTruncation {
             $lastPossibleDate = (Get-Date).AddDays(-$daysToKeepOldFile)
             Write-InfoLog $logFilePath "   Removing entries older than >>${lastPossibleDate}<<." $beVerbose
 
-            $matchingItems = Get-ChildItem -Path "$path" -Recurse -ErrorAction SilentlyContinue | Where-Object LastWriteTime -LT $lastPossibleDate
+            $matchingItems = Get-ChildItem -Path "$path" -Recurse -ErrorAction SilentlyContinue | 
+                Where-Object LastWriteTime -lt $lastPossibleDate
 
             $numberOfItemsToRemove = $matchingItems.Count
 
@@ -514,7 +518,11 @@ Function Start-PathTruncation {
 
             ForEach ($matchingItem In $matchingItems) {
                 If ($DisplayProgessBar -eq $true){
-                    Write-Progress -Activity ":: Removing items." -Status "[${ProcessedFileItemCounter} / ${numberOfItemsToRemove}]" -PercentComplete (($ProcessedFileItemCounter / $numberOfItemsToRemove) * 100) -Id 1 -ParentId 0
+                    Write-Progress -Activity ":: Removing items." `
+                        -Status "[${ProcessedFileItemCounter} / ${numberOfItemsToRemove}]" `
+                        -PercentComplete (($ProcessedFileItemCounter / $numberOfItemsToRemove) * 100) `
+                        -Id 1 `
+                        -ParentId 0
                     ++$ProcessedFileItemCounter
                 }
                 Write-DebugLog $logFilePath "   Trying to remove item >>${matchingItem}<<." $beVerbose
@@ -532,7 +540,11 @@ Function Start-PathTruncation {
             $numberOfItemsToRemove = $matchingItems.Count
             
             If (($DisplayProgessBar -eq $true) -and ($numberOfItemsToRemove -gt 0)){
-                Write-Progress -Activity ":: Removing items." -Status "[${ProcessedFileItemCounter} / ${numberOfItemsToRemove}]" -PercentComplete (($ProcessedFileItemCounter / $numberOfItemsToRemove) * 100) -Id 1 -ParentId 0
+                Write-Progress -Activity ":: Removing items." `
+                    -Status "[${ProcessedFileItemCounter} / ${numberOfItemsToRemove}]" `
+                    -PercentComplete (($ProcessedFileItemCounter / $numberOfItemsToRemove) * 100) `
+                    -Id 1 `
+                    -ParentId 0
                 ++$ProcessedFileItemCounter
             }
             Write-InfoLog $logFilePath "   Removing >>${numberOfItemsToRemove}<< entries." $beVerbose
@@ -549,7 +561,8 @@ Function Start-PathTruncation {
 
             Write-DebugLog $logFilePath "Checking for duplicates with file size greater than >>${matchingFileSizeInByte}<< bytes." $beVerbose
 
-            $matchingItems = Get-ChildItem -Path "$path" -Recurse -File -ErrorAction SilentlyContinue | Where-Object Length -ge $matchingFileSizeInByte
+            $matchingItems = Get-ChildItem -Path "$path" -Recurse -File -ErrorAction SilentlyContinue | 
+                Where-Object Length -ge $matchingFileSizeInByte
 
             $numberOfItemsToRemove = $matchingItems.Count
 
@@ -566,7 +579,11 @@ Function Start-PathTruncation {
                         $fileHash = $fileHashObject.Hash
 
                         If ($DisplayProgessBar -eq $true){
-                            Write-Progress -Activity ":: Removing items." -Status "[${ProcessedFileItemCounter} / ${numberOfItemsToRemove}]" -PercentComplete (($ProcessedFileItemCounter / $numberOfItemsToRemove) * 100) -Id 1 -ParentId 0
+                            Write-Progress -Activity ":: Removing items." `
+                                -Status "[${ProcessedFileItemCounter} / ${numberOfItemsToRemove}]" `
+                                -PercentComplete (($ProcessedFileItemCounter / $numberOfItemsToRemove) * 100) `
+                                -Id 1 `
+                                -ParentId 0
                             ++$ProcessedFileItemCounter
                         }
 
@@ -626,7 +643,11 @@ Function Start-PathTruncations {
         $CurrentObjectPath = $currentObject.path
 
         If ($DisplayProgressBar -eq $true) {
-            Write-Progress -Activity ":: Processing list of truncable objects." -Status "[${CurrentTruncableObjectCounter} / ${TotalAmountOfTruncableObjects}]" -PercentComplete (($CurrentTruncableObjectCounter / $TotalAmountOfTruncableObjects) * 100) -CurrentOperation "   Processing path >>${CurrentObjectPath}<<" -Id 0
+            Write-Progress -Activity ":: Processing list of truncable objects." `
+                -Status "[${CurrentTruncableObjectCounter} / ${TotalAmountOfTruncableObjects}]" `
+                -PercentComplete (($CurrentTruncableObjectCounter / $TotalAmountOfTruncableObjects) * 100) `
+                -CurrentOperation "   Processing path >>${CurrentObjectPath}<<" `
+                -Id 0
         }
         #check if path ends with a wildcard
         If ($CurrentObjectPath -match '\$user') {
