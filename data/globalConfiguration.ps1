@@ -81,16 +81,18 @@ $collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\L
 #  eo: chromium
 
 #  bo: user temp folder
-$collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Local\Temp\*' 0)) | Out-Null
-$collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Local\Microsoft\Windows\WER\*' 0)) | Out-Null
-$collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Local\Microsoft\Windows\AppCache\' 0)) | Out-Null
-$collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Local\Microsoft\Windows\Temporary Internet Files\*' 0)) | Out-Null
+$collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Adobe\Flash Player\*' 0)) | Out-Null
 $collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Local\CrashDumps\*' 0)) | Out-Null
+$collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Local\Microsoft\Windows\AppCache\' 0)) | Out-Null
+$collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Local\Microsoft\Windows\WER\*' 0)) | Out-Null
+$collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Local\Microsoft\Windows\Temporary Internet Files\*' 0)) | Out-Null
+$collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Local\NuGet\Cache\*' 7)) | Out-Null
+$collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Local\Temp\*' 0)) | Out-Null
+$collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Macromedia\Flash Player\*' 0)) | Out-Null
 $collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Roaming\Adobe\Flash Player\*' 0)) | Out-Null
 $collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Roaming\Macromedia\Flash Player\*' 0)) | Out-Null
 $collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Roaming\Microsoft\Windows\Recent\*' 0)) | Out-Null
-$collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Adobe\Flash Player\*' 0)) | Out-Null
-$collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Macromedia\Flash Player\*' 0)) | Out-Null
+$collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Roaming\Signal\attachments.noindex\*' 31)) | Out-Null
 $collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Sun\Java\*' 0)) | Out-Null
 #  eo: user temp folder
 

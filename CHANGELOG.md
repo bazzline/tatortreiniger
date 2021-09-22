@@ -44,6 +44,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 
 * Added check if matching item file path is valid to prevent >>Remove-Item : An Object with the give path ... does not exist<< error
+* Added more temporary or cache paths for different applications
 * Started section [documentation](documentation) and added example image to show something
 
 ### Changed
