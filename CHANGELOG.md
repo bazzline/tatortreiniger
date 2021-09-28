@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### To Add
 
+* add or replace logging of "starting <function name>" with `"$($PSCmdlet.MyInvocation.MyCommand.Name)"`. [see](https://arcanecode.com/2021/09/27/fun-with-powershell-write-verbose/)
+    * Refactor `Write-LogMessage` by using the `Write-Verbose` etc. message types
 * add usage of [transcript](https://www.tutorialspoint.com/how-to-use-a-transcript-in-powershell)
 * add translation files
 * added default value `$false` to each optional parameter `$beVerbose`
@@ -43,13 +45,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
-* Added check if matching item file path is valid to prevent >>Remove-Item : An Object with the give path ... does not exist<< error
-* Added more temporary or cache paths for different applications
-* Started section [documentation](documentation) and added example image to show something
+* started section [documentation](documentation) and added example image to show something
 
 ### Changed
-
-* Changed file hashing algorithm from >>md5<< to >>sha256<<
 
 ## [0.11.0](https://github.com/bazzline/tatortreiniger/tree/0.11.0) - released at 20210915
 
