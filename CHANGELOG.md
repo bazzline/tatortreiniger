@@ -27,7 +27,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 * Evaluate how easy it is to use the collection of paths and create full qualifyed paths out of it
     * This way we would be able to log and process real paths instead of paths with wild cards
     * e.g. `C:\foo\*.bar\*` would became `C:\foo\baz.bar` and maybe more
-* Refactor "Log-Message" and the other "Log-*" functions
+* Refactor `Log-Message` and the other `Log-*` functions
     * Split it into "Log-Message" and "Output-Message" to ease up log with log level verbose but display only with information
     * Maybe create a "outputVerboseLevel" similar to "logLevel" setting
     * or ...
@@ -45,6 +45,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
+* Added `Clear-Host` at the end of the last `Start-PathTruncations` to refresh screen and remove the last progress bar
 * Started section [documentation](documentation) and added example image to show something
 
 ### Changed

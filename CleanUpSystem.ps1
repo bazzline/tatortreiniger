@@ -672,6 +672,10 @@ Function Start-PathTruncations {
         ++$CurrentTruncableObjectCounter
     }
 
+    If ($DisplayProgressBar -eq $true) {
+        Clear-Host
+    }
+
     Return $numberOfRemovedFileSystemObjects
 }
 
