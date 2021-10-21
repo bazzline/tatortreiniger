@@ -642,21 +642,30 @@ Function Start-PathTruncations {
 
         $CurrentObjectPath = $currentObject.path
 
-        If ($DisplayProgressBar -eq $true) {
-            Write-Progress -Activity ":: Processing list of truncable objects." `
-                -Status "[${CurrentTruncableObjectCounter} / ${TotalAmountOfTruncableObjects}]" `
-                -PercentComplete (($CurrentTruncableObjectCounter / $TotalAmountOfTruncableObjects) * 100) `
-                -CurrentOperation "   Processing path >>${CurrentObjectPath}<<" `
-                -Id 0
-        }
         #check if path ends with a wildcard
         If ($CurrentObjectPath -match '\$user') {
             ForEach ($currentUserName In $listOfUserNames) {
                 $currentUserDirectoryPath = $CurrentObjectPath -replace '\$user', $currentUserName
+
+                If ($DisplayProgressBar -eq $true) {
+                    Write-Progress -Activity ":: Processing list of truncable objects." `
+                        -Status "[${CurrentTruncableObjectCounter} / ${TotalAmountOfTruncableObjects}]" `
+                        -PercentComplete (($CurrentTruncableObjectCounter / $TotalAmountOfTruncableObjects) * 100) `
+                        -CurrentOperation "   Processing path >>${currentUserDirectoryPath}<<" `
+                        -Id 0
+                }
                
                 $numberOfRemovedFileSystemObjects = Start-PathTruncation $currentUserDirectoryPath $currentObject.days_to_keep_old_file $currentObject.check_for_duplicates $currentObject.check_for_duplicates_greater_than_megabyte $logFilePath $numberOfRemovedFileSystemObjects $beVerbose $isDryRun
             }
         } Else {
+            If ($DisplayProgressBar -eq $true) {
+                Write-Progress -Activity ":: Processing list of truncable objects." `
+                    -Status "[${CurrentTruncableObjectCounter} / ${TotalAmountOfTruncableObjects}]" `
+                    -PercentComplete (($CurrentTruncableObjectCounter / $TotalAmountOfTruncableObjects) * 100) `
+                    -CurrentOperation "   Processing path >>${CurrentObjectPath}<<" `
+                    -Id 0
+            }
+
             $numberOfRemovedFileSystemObjects = Start-PathTruncation $CurrentObjectPath $currentObject.days_to_keep_old_file $currentObject.check_for_duplicates $currentObject.check_for_duplicates_greater_than_megabyte $logFilePath $numberOfRemovedFileSystemObjects $beVerbose $isDryRun
         }
 

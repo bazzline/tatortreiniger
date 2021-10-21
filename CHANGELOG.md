@@ -45,9 +45,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
-* started section [documentation](documentation) and added example image to show something
+* Started section [documentation](documentation) and added example image to show something
 
 ### Changed
+
+* Changed output of `$user` path. Instead of keeping `$user`, now user path is displayed
 
 ## [0.11.0](https://github.com/bazzline/tatortreiniger/tree/0.11.0) - released at 20210915
 
