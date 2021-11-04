@@ -381,10 +381,16 @@ Function Start-CleanUpSystem
     #  If we would source the files via a function, the sourced in variables would exist in the scope of the function only.
     If ((Test-Path $globalConfigurationFilePath)) {
         . $globalConfigurationFilePath
+    } Else {
+        Write-ErrorLog $logFilePath $("Could not find path to global configuration >>" + $globalConfigurationFilePath + "<<. Global configuration is mandatory!") $beVerbose
+        
+        Exit 3
     }
 
     If ((Test-Path $localConfigurationFilePath)) {
         . $localConfigurationFilePath
+    } Else {
+        Write-InfoLog $logFilePath $(":: Could not find path to local configuration >>" + $localConfigurationFilePath + "<<. This run withouts local configuration!") $beVerbose
     }
 
     $logFilePath = Get-LogFilePath $logDirectoryPath
