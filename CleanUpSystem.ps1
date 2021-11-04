@@ -84,9 +84,7 @@ Function New-LockFileOrExit {
         } Else {
             Write-Error ":: Error"
             Write-Error "   Could not aquire lock, lock file >>${lockFilePath}<< exists."
-            Write-ErrorLog $logFilePath "Could not aquire lock. Lock file >>${lockFilePath}<< exists." $beVerbose
-
-            Exit 1
+            Write-ErrorLogAndExit $logFilePath "Could not aquire lock. Lock file >>${lockFilePath}<< exists." ($CurrentExitCodeCounter++) $beVerbose
         }
     }
 
@@ -119,16 +117,13 @@ Function Remove-LockFileOrExit {
         } Else {
             Write-Error ":: Error"
             Write-Error "   Lockfile in path >>${lockFilePath}<< contains different PID. Expected >>${PID}<<, Actual >>${lockFilePID}<<."
-            Write-ErrorLog $logfilePath  "Lockfile in path >>${lockFilePath}<< contains different PID. Expected >>${PID}<<, Actual >>${lockFilePID}<<." $beVerbose
+            Write-ErrorLogAndExit $logFilePath "Lockfile in path >>${lockFilePath}<< contains different PID. Expected >>${PID}<<, Actual >>${lockFilePID}<<." ($CurrentExitCodeCounter++) $beVerbose
         }
 
-        Exit 1
     } Else {
         Write-Error ":: Error"
         Write-Error "   Could not release lock. Lock file >>${lockFilePath}<< does not exists."
-        Write-ErrorLog $logfilePath "Could not release lock. Lock file >>${lockFilePath}<< does not exists." $beVerbose
-
-        Exit 2
+        Write-ErrorLogAndExit $logFilePath "Could not release lock. Lock file >>${lockFilePath}<< does not exists." ($CurrentExitCodeCounter++) $beVerbose
     }
 }
 
@@ -234,6 +229,27 @@ Function Write-ErrorLog {
     )
 
     Write-LogMessage $path $message 4 $beVerbose
+}
+
+Function Write-ErrorLogAndExit {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$LogFilePath,
+
+        [Parameter(Mandatory = $true)]
+        [string]$LogMessage,
+
+        [Parameter(Mandatory = $true)]
+        [int] $ExitCode,
+
+        [Parameter(Mandatory = $false)]
+        [bool]$BeVerbose = $false
+    )
+
+    Write-ErrorLog $LogFilePath $LogMessage $BeVerbose
+
+    Exit $ExitCode
 }
 
 Function Create-DiskInformation 
@@ -382,15 +398,13 @@ Function Start-CleanUpSystem
     If ((Test-Path $globalConfigurationFilePath)) {
         . $globalConfigurationFilePath
     } Else {
-        Write-ErrorLog $logFilePath $("Could not find path to global configuration >>" + $globalConfigurationFilePath + "<<. Global configuration is mandatory!") $beVerbose
-        
-        Exit 3
+        Write-ErrorLogAndExit $logFilePath "Could not find path to global configuration >>${globalConfigurationFilePath}<<. Global configuration is mandatory!" ($CurrentExitCodeCounter++) $beVerbose
     }
 
     If ((Test-Path $localConfigurationFilePath)) {
         . $localConfigurationFilePath
     } Else {
-        Write-InfoLog $logFilePath $(":: Could not find path to local configuration >>" + $localConfigurationFilePath + "<<. This run withouts local configuration!") $beVerbose
+        Write-InfoLog $logFilePath "Could not find path to local configuration >>${localConfigurationFilePath}<<. This run withouts local configuration!" $beVerbose
     }
 
     $logFilePath = Get-LogFilePath $logDirectoryPath

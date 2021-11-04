@@ -48,6 +48,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 * Added `Clear-Host` at the end of the last `Start-PathTruncations` to refresh screen and remove the last progress bar
 * Added exit statement if global configuration file can not be loaded
 * Added informational log statement if local configuration file can not be loaded
+* Added method `Write-ErrorLogAndExit` and implemented usage to remove duplicated code
 * Started section [documentation](documentation) and added example image to show something
 
 ### Changed
