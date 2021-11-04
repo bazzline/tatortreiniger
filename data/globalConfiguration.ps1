@@ -17,6 +17,18 @@ $deleteRecycleBin = $false #you should use a GPO for this but if you can't just 
 $isDryRun = $false
 #eo: os independent settings
 
+#bo: OS determination helper
+If ($host.Version.Major -lt 7) {
+    If (Test-Path "c:\windows") {
+        $IsLinux = $false
+        $IsWindows = $true
+    } ElseIf (Test-Path "/root") {
+        $IsLinux = $true
+        $IsWindows = $false
+    }
+}
+#eo: OS determination helper
+
 #bo: windows settings
 If ($IsWindows -eq $true) {
     #bo: general variable section
