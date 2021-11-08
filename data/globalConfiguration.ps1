@@ -102,8 +102,9 @@ If ($IsWindows -eq $true) {
     $collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Local\Temp\*' 0)) | Out-Null
     $collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Local\Microsoft\Windows\WER\*' 0)) | Out-Null
     $collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Local\Microsoft\Windows\AppCache\' 0)) | Out-Null
-    $collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Local\Microsoft\Windows\Temporary Internet Files\*' 0)) | Out-Null
     $collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Local\CrashDumps\*' 0)) | Out-Null
+    $collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Local\Hexagon\App Launcher\cache\*' 0)) | Out-Null
+    $collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Local\Microsoft\Windows\Temporary Internet Files\*' 0)) | Out-Null
     $collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Roaming\Adobe\Flash Player\*' 0)) | Out-Null
     $collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Roaming\Macromedia\Flash Player\*' 0)) | Out-Null
     $collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Roaming\Microsoft\Windows\Recent\*' 0)) | Out-Null
