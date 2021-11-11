@@ -45,7 +45,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
-* Added hexagon cache path
+* Added more cache paths of applications
 * Added `Clear-Host` at the end of the last `Start-PathTruncations` to refresh screen and remove the last progress bar
 * Added exit statement if global configuration file can not be loaded
 * Added informational log statement if local configuration file can not be loaded
