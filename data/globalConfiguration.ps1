@@ -60,6 +60,12 @@ If ($IsWindows -eq $true) {
     #$collectionOfTruncableObjects.Add((New-TruncableObject "$env:windir\Prefetch\*" 0)) | Out-Null
     #  eo: different programm paths
 
+    #  bo: lotus/ibm/hcl notes
+    $collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Local\IBM\Notes\Data\IBM_TECHNICAL_SUPPORT\*' 7)) | Out-Null
+    $collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Local\IBM\Notes\Data\workspace\logs\error-log-*.xml' 7)) | Out-Null
+    $collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Local\IBM\Notes\Data\workspace\logs\trace-log-*.xml' 7)) | Out-Null
+    #  eo: lotus/ibm/hcl notes
+
     #  bo: mozilla firefox
     $collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Local\Mozilla\Firefox\Profiles\*.default\cache\*' 0)) | Out-Null
     $collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\AppData\Local\Mozilla\Firefox\Profiles\*.default\cache2\entries\*' 0)) | Out-Null

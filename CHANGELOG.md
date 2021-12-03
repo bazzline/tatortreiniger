@@ -51,6 +51,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 * Added informational log statement if local configuration file can not be loaded
 * Added method `Write-ErrorLogAndExit` and implemented usage to remove duplicated code
 * Added backwarts compatibility in global configuration to support `$IsWindows` on powershell below version 7
+* Added support for Lotus/IBM/HCL Notes
 * Started section [documentation](documentation) and added example image to show something
 
 ### Changed
