@@ -52,6 +52,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 * Added method `Write-ErrorLogAndExit` and implemented usage to remove duplicated code
 * Added backwarts compatibility in global configuration to support `$IsWindows` on powershell below version 7
 * Added support for Lotus/IBM/HCL Notes
+* Added logging if `Remove-Item` is not able to remove the item
 * Started section [documentation](documentation) and added example image to show something
 
 ### Changed

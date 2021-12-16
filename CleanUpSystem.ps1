@@ -145,6 +145,36 @@ Function Get-LogFilePath {
     return $pathToTheLogFile
 }
 
+Function Remove-ItemAndLogResult {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$ItemToRemove,
+
+        [Parameter(Mandatory = $true)]
+        [string]$LogFilePath,
+
+        [Parameter(Mandatory = $false)]
+        [bool]$BeVerbose = $false
+
+        [Parameter(Mandatory = $false)]
+        [bool]$IsDryRun = $false
+    )
+
+    If ($IsDryRun) {
+        Write-DebugLog $LogFilePath "   Would try to remove item >>${ItemToRemove}<<." $BeVerbose
+    } Else {}
+        Write-DebugLog $LogFilePath "   Trying to remove item >>${ItemToRemove}<<." $BeVerbose
+        Remove-Item -Path "$ItemToRemove" -Force -ErrorAction SilentlyContinue
+
+        $RemoveItemWasSucessful = $?
+
+        If ($RemoveItemWasSucessful -ne $true) {
+            Write-InfoLog $LogFilePath "   Item could not be removed." $BeVerbose
+        }
+    }
+}
+
 Function Write-LogMessage {
     [CmdletBinding()]
     param(
@@ -545,12 +575,9 @@ Function Start-PathTruncation {
                         -ParentId 0
                     ++$ProcessedFileItemCounter
                 }
-                Write-DebugLog $logFilePath "   Trying to remove item >>${matchingItem}<<." $beVerbose
 
-                If (!$isDryRun) {
-                    Remove-Item -Path "$path\$matchingItem" -Force -ErrorAction SilentlyContinue
-                    ++$numberOfRemovedFileSystemObjects
-                }
+                Remove-ItemAndLogResult "$path\$matchingItem" $logFilePath $beVerbose $isDryRun
+                ++$numberOfRemovedFileSystemObjects
             }
         } Else {
             Write-InfoLog $logFilePath "   Removing all entries, no date limit provided." $beVerbose
@@ -569,10 +596,8 @@ Function Start-PathTruncation {
             }
             Write-InfoLog $logFilePath "   Removing >>${numberOfItemsToRemove}<< entries." $beVerbose
             
-            If (!$isDryRun) {
-                Remove-Item -Path "$path" -Recurse -Force -ErrorAction SilentlyContinue
-                ++$numberOfRemovedFileSystemObjects
-            }
+            Remove-ItemAndLogResult "$path\$matchingItem" $logFilePath $beVerbose $isDryRun
+            ++$numberOfRemovedFileSystemObjects
         }
 
         If ($checkForDuplicates) {
@@ -610,12 +635,8 @@ Function Start-PathTruncation {
                         If ($listOfFileHashToFilePath.ContainsKey($fileHash)) {
                             Write-DebugLog $logFilePath "   Found duplicated hash >>${fileHash}<<, removing >>${filePathToMatchingItem}<<." $beVerbose
 
-                            If (!$isDryRun) {
-                                Write-DebugLog $logFilePath "   Trying to remove item >>${filePathToMatchingItem}<<." $beVerbose
-
-                                Remove-Item -Path "$filePathToMatchingItem" -Force -ErrorAction SilentlyContinue
-                                ++$numberOfRemovedFileSystemObjects
-                            }
+                            Remove-ItemAndLogResult "$path\$matchingItem" $logFilePath $beVerbose $isDryRun
+                            ++$numberOfRemovedFileSystemObjects
                         } Else {
                             Write-DebugLog $logFilePath "   Adding key >>${fileHash}<< with value >>${matchingItem}<<." $beVerbose
 
