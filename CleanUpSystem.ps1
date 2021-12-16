@@ -155,7 +155,7 @@ Function Remove-ItemAndLogResult {
         [string]$LogFilePath,
 
         [Parameter(Mandatory = $false)]
-        [bool]$BeVerbose = $false
+        [bool]$BeVerbose = $false,
 
         [Parameter(Mandatory = $false)]
         [bool]$IsDryRun = $false
