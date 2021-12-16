@@ -609,7 +609,7 @@ Function Start-PathTruncation {
             Write-InfoLog $logFilePath "   Removing >>${numberOfItemsToRemove}<< entries." $beVerbose
             
             $FullQualifiedPath = Join-Path -Path $pathWithoutStarAtTheEnd -ChildPath $matchingItem
-            Remove-ItemAndLogResult "${FullQualifiedPath}" $false $logFilePath $beVerbose $isDryRun
+            Remove-ItemAndLogResult "${FullQualifiedPath}" $true $logFilePath $beVerbose $isDryRun
             ++$numberOfRemovedFileSystemObjects
         }
 
@@ -649,7 +649,7 @@ Function Start-PathTruncation {
                             Write-DebugLog $logFilePath "   Found duplicated hash >>${fileHash}<<, removing >>${filePathToMatchingItem}<<." $beVerbose
 
                             $FullQualifiedPath = Join-Path -Path $pathWithoutStarAtTheEnd -ChildPath $matchingItem
-                            Remove-ItemAndLogResult "${FullQualifiedPath}" $false $logFilePath $beVerbose $isDryRun
+                            Remove-ItemAndLogResult "${FullQualifiedPath}" $true $logFilePath $beVerbose $isDryRun
                             ++$numberOfRemovedFileSystemObjects
                         } Else {
                             Write-DebugLog $logFilePath "   Adding key >>${fileHash}<< with value >>${matchingItem}<<." $beVerbose
