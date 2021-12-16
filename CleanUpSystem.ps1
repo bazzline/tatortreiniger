@@ -637,7 +637,7 @@ Function Start-PathTruncation {
                         If ($listOfFileHashToFilePath.ContainsKey($fileHash)) {
                             Write-DebugLog $logFilePath "   Found duplicated hash >>${fileHash}<<, removing >>${filePathToMatchingItem}<<." $beVerbose
 
-                            Remove-ItemAndLogResult "$path\$matchingItem" $logFilePath $beVerbose $isDryRun
+                            Remove-ItemAndLogResult "${pathWithoutStarAtTheEnd}\${matchingItem}" $logFilePath $beVerbose $isDryRun
                             ++$numberOfRemovedFileSystemObjects
                         } Else {
                             Write-DebugLog $logFilePath "   Adding key >>${fileHash}<< with value >>${matchingItem}<<." $beVerbose
