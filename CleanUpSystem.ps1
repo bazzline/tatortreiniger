@@ -554,8 +554,9 @@ Function Start-PathTruncation {
     }
 
     If ($processPath) {
-        Write-InfoLog $logFilePath "Truncating path >>${path}<< with day to keep old file value of >>$daysToKeepOldFile<<." $beVerbose
+        Write-InfoLog $logFilePath "Truncating path >>${path}<< with days to keep files older than >>${daysToKeepOldFile}<< days." $beVerbose
 
+        #if we have to check against last modification date
         If ($daysToKeepOldFile -ne 0) {
             $lastPossibleDate = (Get-Date).AddDays(-$daysToKeepOldFile)
             Write-InfoLog $logFilePath "   Removing entries older than >>${lastPossibleDate}<<." $beVerbose
@@ -577,7 +578,7 @@ Function Start-PathTruncation {
                     ++$ProcessedFileItemCounter
                 }
 
-                Remove-ItemAndLogResult "$path\$matchingItem" $logFilePath $beVerbose $isDryRun
+                Remove-ItemAndLogResult "${pathWithoutStarAtTheEnd}\${matchingItem}" $logFilePath $beVerbose $isDryRun
                 ++$numberOfRemovedFileSystemObjects
             }
         } Else {
@@ -597,7 +598,7 @@ Function Start-PathTruncation {
             }
             Write-InfoLog $logFilePath "   Removing >>${numberOfItemsToRemove}<< entries." $beVerbose
             
-            Remove-ItemAndLogResult "$path\$matchingItem" $logFilePath $beVerbose $isDryRun
+            Remove-ItemAndLogResult "${pathWithoutStarAtTheEnd}\${matchingItem}" $logFilePath $beVerbose $isDryRun
             ++$numberOfRemovedFileSystemObjects
         }
 

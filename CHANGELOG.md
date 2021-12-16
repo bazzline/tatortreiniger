@@ -58,6 +58,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 
 * Changed output of `$user` path. Instead of keeping `$user`, now user path is displayed
+* Found and fixed a bug when dealing with files for paths like `\foo\bar\*`
+    * The path with the `*` was used so there was never a chance this exact file (matching item) could be removed
 
 ## [0.11.0](https://github.com/bazzline/tatortreiniger/tree/0.11.0) - released at 20210915
 
