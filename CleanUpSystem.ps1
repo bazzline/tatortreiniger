@@ -163,7 +163,7 @@ Function Remove-ItemAndLogResult {
 
     If ($IsDryRun) {
         Write-DebugLog $LogFilePath "   Would try to remove item >>${ItemToRemove}<<." $BeVerbose
-    } Else {}
+    } Else {
         Write-DebugLog $LogFilePath "   Trying to remove item >>${ItemToRemove}<<." $BeVerbose
         Remove-Item -Path "$ItemToRemove" -Force -ErrorAction SilentlyContinue
 
