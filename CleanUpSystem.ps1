@@ -535,12 +535,13 @@ Function Start-PathTruncation {
     $ProcessedFileItemCounter = 1
 
     #if path ends with >>\*<<
-    If ($path -match '\\\*$') {
-        $pathWithoutWildCard = $path.Substring(0,$path.Length-1)
+    $pathEndsWithAStar = ($path -match '\\\*$')
+    $pathWithoutStarAtTheEnd = $path.Substring(0, $path.Length-1)
 
+    If ($pathEndsWithAStar) {
         #if path does not contain another wild card
-        If (!$pathWithoutWildCard.Contains('*')) {
-            If (!(Test-Path $pathWithoutWildCard)) {
+        If (!$pathWithoutStarAtTheEnd.Contains('*')) {
+            If (!(Test-Path $pathWithoutStarAtTheEnd)) {
                 Write-InfoLog $logFilePath "Path does not exist >>${path}<<. Skipping it." $beVerbose
                 $processPath = $false
             }
