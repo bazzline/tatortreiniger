@@ -151,6 +151,9 @@ Function Remove-ItemAndLogResult {
         [Parameter(Mandatory = $true)]
         [string]$ItemToRemove,
 
+        [Parameter(Mandatory = $false)]
+        [bool]$BeRecursive = $false,
+
         [Parameter(Mandatory = $true)]
         [string]$LogFilePath,
 
@@ -166,8 +169,11 @@ Function Remove-ItemAndLogResult {
     } Else {
         Write-DebugLog $LogFilePath "   Trying to remove item >>${ItemToRemove}<<." $BeVerbose
 
-
-        Remove-Item -Path "$ItemToRemove" -Force -ErrorAction SilentlyContinue
+        If ($BeRecursive -eq $true) {
+            Remove-Item -Path "$ItemToRemove" -Force -Recurse -ErrorAction SilentlyContinue
+        } Else {
+            Remove-Item -Path "$ItemToRemove" -Force -ErrorAction SilentlyContinue
+        }
 
         $RemoveItemWasSucessful = $?
 
@@ -582,7 +588,7 @@ Function Start-PathTruncation {
 
                 $FullQualifiedPath = Join-Path -Path $pathWithoutStarAtTheEnd -ChildPath $matchingItem
 
-                Remove-ItemAndLogResult "${FullQualifiedPath}" $logFilePath $beVerbose $isDryRun
+                Remove-ItemAndLogResult "${FullQualifiedPath}" $true $logFilePath $beVerbose $isDryRun
                 ++$numberOfRemovedFileSystemObjects
             }
         } Else {
@@ -603,7 +609,7 @@ Function Start-PathTruncation {
             Write-InfoLog $logFilePath "   Removing >>${numberOfItemsToRemove}<< entries." $beVerbose
             
             $FullQualifiedPath = Join-Path -Path $pathWithoutStarAtTheEnd -ChildPath $matchingItem
-            Remove-ItemAndLogResult "${FullQualifiedPath}" $logFilePath $beVerbose $isDryRun
+            Remove-ItemAndLogResult "${FullQualifiedPath}" $false $logFilePath $beVerbose $isDryRun
             ++$numberOfRemovedFileSystemObjects
         }
 
@@ -643,7 +649,7 @@ Function Start-PathTruncation {
                             Write-DebugLog $logFilePath "   Found duplicated hash >>${fileHash}<<, removing >>${filePathToMatchingItem}<<." $beVerbose
 
                             $FullQualifiedPath = Join-Path -Path $pathWithoutStarAtTheEnd -ChildPath $matchingItem
-                            Remove-ItemAndLogResult "${FullQualifiedPath}" $logFilePath $beVerbose $isDryRun
+                            Remove-ItemAndLogResult "${FullQualifiedPath}" $false $logFilePath $beVerbose $isDryRun
                             ++$numberOfRemovedFileSystemObjects
                         } Else {
                             Write-DebugLog $logFilePath "   Adding key >>${fileHash}<< with value >>${matchingItem}<<." $beVerbose
