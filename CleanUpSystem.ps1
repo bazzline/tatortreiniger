@@ -165,6 +165,8 @@ Function Remove-ItemAndLogResult {
         Write-DebugLog $LogFilePath "   Would try to remove item >>${ItemToRemove}<<." $BeVerbose
     } Else {
         Write-DebugLog $LogFilePath "   Trying to remove item >>${ItemToRemove}<<." $BeVerbose
+
+
         Remove-Item -Path "$ItemToRemove" -Force -ErrorAction SilentlyContinue
 
         $RemoveItemWasSucessful = $?
@@ -578,7 +580,9 @@ Function Start-PathTruncation {
                     ++$ProcessedFileItemCounter
                 }
 
-                Remove-ItemAndLogResult "${pathWithoutStarAtTheEnd}\${matchingItem}" $logFilePath $beVerbose $isDryRun
+                $FullQualifiedPath = Join-Path -Path $pathWithoutStarAtTheEnd -ChildPath $matchingItem
+
+                Remove-ItemAndLogResult "${FullQualifiedPath}" $logFilePath $beVerbose $isDryRun
                 ++$numberOfRemovedFileSystemObjects
             }
         } Else {
@@ -598,7 +602,8 @@ Function Start-PathTruncation {
             }
             Write-InfoLog $logFilePath "   Removing >>${numberOfItemsToRemove}<< entries." $beVerbose
             
-            Remove-ItemAndLogResult "${pathWithoutStarAtTheEnd}\${matchingItem}" $logFilePath $beVerbose $isDryRun
+            $FullQualifiedPath = Join-Path -Path $pathWithoutStarAtTheEnd -ChildPath $matchingItem
+            Remove-ItemAndLogResult "${FullQualifiedPath}" $logFilePath $beVerbose $isDryRun
             ++$numberOfRemovedFileSystemObjects
         }
 
@@ -637,7 +642,8 @@ Function Start-PathTruncation {
                         If ($listOfFileHashToFilePath.ContainsKey($fileHash)) {
                             Write-DebugLog $logFilePath "   Found duplicated hash >>${fileHash}<<, removing >>${filePathToMatchingItem}<<." $beVerbose
 
-                            Remove-ItemAndLogResult "${pathWithoutStarAtTheEnd}\${matchingItem}" $logFilePath $beVerbose $isDryRun
+                            $FullQualifiedPath = Join-Path -Path $pathWithoutStarAtTheEnd -ChildPath $matchingItem
+                            Remove-ItemAndLogResult "${FullQualifiedPath}" $logFilePath $beVerbose $isDryRun
                             ++$numberOfRemovedFileSystemObjects
                         } Else {
                             Write-DebugLog $logFilePath "   Adding key >>${fileHash}<< with value >>${matchingItem}<<." $beVerbose
