@@ -105,12 +105,12 @@ Class TruncableObject
         return $this.CheckForDuplicates
     }
 
-    [bool] Get-CheckForDuplicatesGreaterThanMegabyte()
+    [int] Get-CheckForDuplicatesGreaterThanMegabyte()
     {
         return $this.CheckForDuplicatesGreaterThanMegabyte
     }
 
-    [bool] Get-DaysToKeepOldFiles()
+    [int] Get-DaysToKeepOldFiles()
     {
         return $this.DaysToKeepOldFiles
     }
@@ -118,6 +118,12 @@ Class TruncableObject
     [string] Get-Path()
     {
         return $this.Path
+    }
+
+    [void] Set-Path(
+        [string] $Path
+    ) {
+        $this.Path = $Path
     }
     #eo functions
 }
@@ -533,9 +539,6 @@ Function Start-PathTruncation {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
-        [string] $path,
-
-        [Parameter(Mandatory = $true)]
         [TruncableObject] $TruncableObject,
 
         [Parameter(Mandatory = $true)]
@@ -549,37 +552,37 @@ Function Start-PathTruncation {
     )
 
     $DisplayProgessBar = ($beVerbose -ne $true)
-    $processPath = $true
+    $ProcessPath = $true
     $ProcessedFileItemCounter = 1
 
     #if path ends with >>\*<<
-    $pathEndsWithAStar = ($path -match '\\\*$')
+    $pathEndsWithAStar = ($TruncableObject.Get-Path() -match '\\\*$')
     $pathWithoutStarAtTheEnd = $path.Substring(0, $path.Length-1)
 
     If ($pathEndsWithAStar) {
         #if path does not contain another wild card
         If (!$pathWithoutStarAtTheEnd.Contains('*')) {
             If (!(Test-Path $pathWithoutStarAtTheEnd)) {
-                $Logger.Info("Path does not exist >>${path}<<. Skipping it.")
-                $processPath = $false
+                $Logger.Info("Path does not exist >>" + $TruncableObject.Get-Path() + "<<. Skipping it.")
+                $ProcessPath = $false
             }
         }
     } Else {
-        If (!(Test-Path $path)) {
-            $Logger.Info("Path does not exist >>${path}<<. Skipping it.")
-            $processPath = $false
+        If (!(Test-Path $TruncableObject.Get-Path())) {
+            $Logger.Info("Path does not exist >>" + $TruncableObject.Get-Path() + "<<. Skipping it.")
+            $ProcessPath = $false
         }
     }
 
-    If ($processPath) {
-        $Logger.Info("Truncating path >>${path}<< with days to keep files older than >>" + $TruncableObject.Get-DaysToKeepOldFiles() + "<< days.")
+    If ($ProcessPath) {
+        $Logger.Info("Truncating path >>" + $TruncableObject.Get-Path() + "<< with days to keep files older than >>" + $TruncableObject.Get-DaysToKeepOldFiles() + "<< days.")
 
         #if we have to check against last modification date
         If ($TruncableObject.Get-DaysToKeepOldFiles() -ne 0) {
             $lastPossibleDate = (Get-Date).AddDays(-$TruncableObject.Get-DaysToKeepOldFiles())
             $Logger.Info("   Removing entries older than >>${lastPossibleDate}<<.")
 
-            $matchingItems = Get-ChildItem -Path "$path" -Recurse -ErrorAction SilentlyContinue | 
+            $matchingItems = Get-ChildItem -Path $TruncableObject.Get-Path() -Recurse -ErrorAction SilentlyContinue | 
                 Where-Object LastWriteTime -lt $lastPossibleDate
 
             $numberOfItemsToRemove = $matchingItems.Count
@@ -604,7 +607,7 @@ Function Start-PathTruncation {
         } Else {
             $Logger.Info("   Removing all entries, no date limit provided.")
 
-            $matchingItems = Get-ChildItem -Path "$path" -Recurse -ErrorAction SilentlyContinue
+            $matchingItems = Get-ChildItem -Path $TruncableObject.Get-Path() -Recurse -ErrorAction SilentlyContinue
 
             $numberOfItemsToRemove = $matchingItems.Count
             
@@ -629,7 +632,7 @@ Function Start-PathTruncation {
 
             $Logger.Debug("Checking for duplicates with file size greater than >>${matchingFileSizeInByte}<< bytes.")
 
-            $matchingItems = Get-ChildItem -Path "$path" -Recurse -File -ErrorAction SilentlyContinue | 
+            $matchingItems = Get-ChildItem -Path $TruncableObject.Get-Path() -Recurse -File -ErrorAction SilentlyContinue | 
                 Where-Object Length -ge $matchingFileSizeInByte
 
             $numberOfItemsToRemove = $matchingItems.Count
@@ -638,7 +641,7 @@ Function Start-PathTruncation {
                 $Logger.Info("   Checking >>${numberOfItemsToRemove}<< entries of being duplicates.")
 
                 ForEach ($matchingItem In $matchingItems) {
-                    $filePathToMatchingItem = $("${path}\${matchingItem}")
+                    $filePathToMatchingItem = $($TruncableObject.Get-Path() + "\${matchingItem}")
                     $Logger.Debug("   Processing matching item file path >>${filePathToMatchingItem}<<.")
 
                     If (Test-Path -Path $filePathToMatchingItem) {
@@ -683,7 +686,7 @@ Function Start-PathTruncations {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
-        [System.Collections.ArrayList]$collectionOfTruncableObjects,
+        [System.Collections.ArrayList] $CollectionOfTruncableObjects,
 
         [Parameter(Mandatory = $true)]
         [Logger] $Logger,
@@ -692,35 +695,38 @@ Function Start-PathTruncations {
         [bool] $beVerbose = $false
     )
 
-    $listOfUserPaths = Get-ChildItem "C:\Users" | Select-Object Name
-    $listOfUserNames = $listOfUserPaths.Name
-    $numberOfRemovedFileSystemObjects = 0
-    $TotalAmountOfTruncableObjects = $collectionOfTruncableObjects.Count
+    $ListOfUserPaths = Get-ChildItem "C:\Users" | Select-Object Name
+
     $CurrentTruncableObjectCounter = 0
     $DisplayProgressBar = ($beVerbose -ne $true)
+    $ListOfUserNames = $ListOfUserPaths.Name
+    $NumberOfRemovedFileSystemObjects = 0
+    $TotalAmountOfTruncableObjects = $CollectionOfTruncableObjects.Count
 
     If ($DisplayProgressBar -eq $true) {
         Clear-Host
     }
 
-    ForEach ($currentObject In $collectionOfTruncableObjects) {
+    ForEach ($CurrentTruncableObject In $CollectionOfTruncableObjects) {
 
-        $CurrentObjectPath = $currentObject.path
+        $CurrentObjectPath = $CurrentTruncableObject.Get-Path()
 
         #check if path ends with a wildcard
         If ($CurrentObjectPath -match '\$user') {
-            ForEach ($currentUserName In $listOfUserNames) {
-                $currentUserDirectoryPath = $CurrentObjectPath -replace '\$user', $currentUserName
+            ForEach ($currentUserName In $ListOfUserNames) {
+                $CurrentUserDirectoryPath = $CurrentObjectPath -replace '\$user', $currentUserName
 
                 If ($DisplayProgressBar -eq $true) {
                     Write-Progress -Activity ":: Processing list of truncable objects." `
                         -Status "[${CurrentTruncableObjectCounter} / ${TotalAmountOfTruncableObjects}]" `
                         -PercentComplete (($CurrentTruncableObjectCounter / $TotalAmountOfTruncableObjects) * 100) `
-                        -CurrentOperation "   Processing path >>${currentUserDirectoryPath}<<" `
+                        -CurrentOperation "   Processing path >>${CurrentUserDirectoryPath}<<" `
                         -Id 0
                 }
+
+                $CurrentTruncableObject.Set-Path($CurrentUserDirectoryPath)
                
-                $numberOfRemovedFileSystemObjects = Start-PathTruncation $currentUserDirectoryPath $currentObject.days_to_keep_old_file $currentObject.check_for_duplicates $currentObject.check_for_duplicates_greater_than_megabyte $Logger $numberOfRemovedFileSystemObjects $isDryRun
+                $NumberOfRemovedFileSystemObjects = Start-PathTruncation $CurrentTruncableObject $Logger $numberOfRemovedFileSystemObjects $isDryRun
             }
         } Else {
             If ($DisplayProgressBar -eq $true) {
@@ -731,7 +737,7 @@ Function Start-PathTruncations {
                     -Id 0
             }
 
-            $numberOfRemovedFileSystemObjects = Start-PathTruncation $CurrentObjectPath $currentObject.days_to_keep_old_file $currentObject.check_for_duplicates $currentObject.check_for_duplicates_greater_than_megabyte $Logger $numberOfRemovedFileSystemObjects $isDryRun
+            $NumberOfRemovedFileSystemObjects = Start-PathTruncation $CurrentTruncableObject $Logger $numberOfRemovedFileSystemObjects $isDryRun
         }
 
         ++$CurrentTruncableObjectCounter
@@ -741,7 +747,7 @@ Function Start-PathTruncations {
         Clear-Host
     }
 
-    Return $numberOfRemovedFileSystemObjects
+    Return $NumberOfRemovedFileSystemObjects
 }
 
 Start-CleanUpSystem
