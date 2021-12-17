@@ -138,13 +138,10 @@ Function New-LockFileOrExit {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
-        [string]$lockFilePath,
+        [string] $lockFilePath,
 
         [Parameter(Mandatory = $true)]
-        [string]$logFilePath,
-
-        [Parameter(Mandatory = $false)]
-        [bool]$beVerbose = $false
+        [Logger] $Logger
     )
 
     If (Test-Path $lockFilePath) {
@@ -153,33 +150,30 @@ Function New-LockFileOrExit {
         $YesOrNo = Read-Host -Prompt "   Should I remove it? (y|N)"
 
         If ($YesOrNo.StartsWith("y") -eq $true) {
-            Write-DebugLog $logFilePath "Removing existing lock file >>${lockFilePath}<< after asking the user." $beVerbose
+            $Logger.Debug("Removing existing lock file >>${lockFilePath}<< after asking the user.")
 
             Remove-Item -Path $lockFilePath
         } Else {
             Write-Error ":: Error"
             Write-Error "   Could not aquire lock, lock file >>${lockFilePath}<< exists."
-            Write-ErrorLogAndExit $logFilePath "Could not aquire lock. Lock file >>${lockFilePath}<< exists." ($CurrentExitCodeCounter++) $beVerbose
+            Write-ErrorLogAndExit $Logger "Could not aquire lock. Lock file >>${lockFilePath}<< exists." ($CurrentExitCodeCounter++)
         }
     }
 
     New-Item -ItemType File $lockFilePath
     Set-Content -Path $lockFilePath -Value "${PID}"
 
-    Write-DebugLog $logFilePath "Lock file create, path >>${lockFilePath}<<, content >>${PID}<<" $beVerbose
+    $Logger.Debug("Lock file create, path >>${lockFilePath}<<, content >>${PID}<<")
 }
 
 Function Remove-LockFileOrExit {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
-        [string]$lockFilePath,
+        [string] $lockFilePath,
 
         [Parameter(Mandatory = $true)]
-        [string]$logFilePath,
-
-        [Parameter(Mandatory = $false)]
-        [bool]$beVerbose = $false
+        [Logger] $Logger
     )
 
     If (Test-Path $lockFilePath) {
@@ -188,17 +182,17 @@ Function Remove-LockFileOrExit {
         If ($lockFilePID -eq $PID ){
             Remove-Item -Path $lockFilePath
 
-            Write-DebugLog $logFilePath "Lock file removed, path >>${lockFilePath}<<" $beVerbose
+            $Logger.Debug("Lock file removed, path >>${lockFilePath}<<")
         } Else {
             Write-Error ":: Error"
             Write-Error "   Lockfile in path >>${lockFilePath}<< contains different PID. Expected >>${PID}<<, Actual >>${lockFilePID}<<."
-            Write-ErrorLogAndExit $logFilePath "Lockfile in path >>${lockFilePath}<< contains different PID. Expected >>${PID}<<, Actual >>${lockFilePID}<<." ($CurrentExitCodeCounter++) $beVerbose
+            Write-ErrorLogAndExit $Logger "Lockfile in path >>${lockFilePath}<< contains different PID. Expected >>${PID}<<, Actual >>${lockFilePID}<<." ($CurrentExitCodeCounter++)
         }
 
     } Else {
         Write-Error ":: Error"
         Write-Error "   Could not release lock. Lock file >>${lockFilePath}<< does not exists."
-        Write-ErrorLogAndExit $logFilePath "Could not release lock. Lock file >>${lockFilePath}<< does not exists." ($CurrentExitCodeCounter++) $beVerbose
+        Write-ErrorLogAndExit $Logger "Could not release lock. Lock file >>${lockFilePath}<< does not exists." ($CurrentExitCodeCounter++)
     }
 }
 
@@ -224,25 +218,22 @@ Function Remove-ItemAndLogResult {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
-        [string]$ItemToRemove,
+        [string] $ItemToRemove,
 
         [Parameter(Mandatory = $false)]
-        [bool]$BeRecursive = $false,
+        [bool] $BeRecursive = $false,
 
         [Parameter(Mandatory = $true)]
-        [string]$LogFilePath,
+        [Logger] $Logger,
 
         [Parameter(Mandatory = $false)]
-        [bool]$BeVerbose = $false,
-
-        [Parameter(Mandatory = $false)]
-        [bool]$IsDryRun = $false
+        [bool] $IsDryRun = $false
     )
 
     If ($IsDryRun) {
-        Write-DebugLog $LogFilePath "   Would try to remove item >>${ItemToRemove}<<." $BeVerbose
+        $Logger.Debug("   Would try to remove item >>${ItemToRemove}<<.")
     } Else {
-        Write-DebugLog $LogFilePath "   Trying to remove item >>${ItemToRemove}<<." $BeVerbose
+        $Logger.Debug("   Trying to remove item >>${ItemToRemove}<<.")
 
         If ($BeRecursive -eq $true) {
             Remove-Item -Path "$ItemToRemove" -Force -Recurse -ErrorAction SilentlyContinue
@@ -253,7 +244,7 @@ Function Remove-ItemAndLogResult {
         $RemoveItemWasSucessful = $?
 
         If ($RemoveItemWasSucessful -ne $true) {
-            Write-InfoLog $LogFilePath "   Item could not be removed." $BeVerbose
+            $Logger.Info("   Item could not be removed.")
         }
     }
 }
@@ -348,19 +339,16 @@ Function Write-ErrorLogAndExit {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
-        [string]$LogFilePath,
+        [Logger] $Logger,
 
         [Parameter(Mandatory = $true)]
-        [string]$LogMessage,
+        [string] $LogMessage,
 
         [Parameter(Mandatory = $true)]
-        [int] $ExitCode,
-
-        [Parameter(Mandatory = $false)]
-        [bool]$BeVerbose = $false
+        [int] $ExitCode
     )
 
-    Write-ErrorLog $LogFilePath $LogMessage $BeVerbose
+    Logger.Error($LogMessage)
 
     Exit $ExitCode
 }
@@ -425,13 +413,10 @@ Function Delete-RecycleBin {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
-        [string] $logFilePath,
-
-        [Parameter(Mandatory = $false)]
-        [bool] $beVerbose = $false
+        [Logger] $Logger
     )
 
-    Write-InfoLog $logFilePath ":: Starting deletion of recycle bin." $beVerbose
+    $Logger.Info(":: Starting deletion of recycle bin.")
 
     $IsOlderThanWindowsServer2016 = ( [System.Environment]::OSVersion.Version.Major -lt 10 );
 
@@ -449,7 +434,7 @@ Function Delete-RecycleBin {
         }
     }
 
-    Write-InfoLog $logFilePath ":: Finished deletion of recycle bin." $beVerbose
+    $Logger.Info(":: Finished deletion of recycle bin.")
 }
 
 Function Write-DiskspaceLog {
@@ -511,41 +496,45 @@ Function Start-CleanUpSystem
     If ((Test-Path $globalConfigurationFilePath)) {
         . $globalConfigurationFilePath
     } Else {
-        Write-ErrorLogAndExit $logFilePath "Could not find path to global configuration >>${globalConfigurationFilePath}<<. Global configuration is mandatory!" ($CurrentExitCodeCounter++) $beVerbose
+        Write-Error "Could not find path to global configuration >>${globalConfigurationFilePath}<<. Global configuration is mandatory!"
+        Exit ($CurrentExitCodeCounter++)
     }
+
+    #we are creating a logger to have at least one running
+    $logFilePath = Get-LogFilePath $logDirectoryPath
+    $Logger = [Logger]::new($LogFilePath, $globalLogLevel, $beVerbose)
 
     If ((Test-Path $localConfigurationFilePath)) {
         . $localConfigurationFilePath
     } Else {
-        Write-InfoLog $logFilePath "Could not find path to local configuration >>${localConfigurationFilePath}<<. This run withouts local configuration!" $beVerbose
+        $Logger.Info("Could not find path to local configuration >>${localConfigurationFilePath}<<. This run withouts local configuration!")
     }
 
+    #we have to create a second instance since there is a chance that one of the three variables have been changed
     $logFilePath = Get-LogFilePath $logDirectoryPath
-    $Logger = [Logger]::new($LogFilePath, $globalLogLevel, $beVerbose)
-    $Logger.Info("ES GEHT!")
-    return
+    $Logger = [Logger]::new($logFilePath, $globalLogLevel, $beVerbose)
     #eo: variable definition
 
     #bo: clean up
     $startDateTime = (Get-Date)
     $startDiskInformation = Create-DiskInformation
 
-    New-LockFileOrExit $lockFilePath $logFilePath $beVerbose
+    New-LockFileOrExit $lockFilePath $Logger
 
-    Write-DiskspaceLog $logFilePath $startDiskInformation $beVerbose
+    Write-DiskspaceLog $Logger $startDiskInformation
 
     #disable windows update service to enable cleanup of >>c:\windows\softwaredistribution<<
     Get-Service -Name wuauserv | Stop-Service -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue -Verbose
 
     #  bo: manipulating the file system
-    $numberOfRemovedFileSystemObjects = Start-PathTruncations $collectionOfTruncableObjects $logFilePath $beVerbose
+    $numberOfRemovedFileSystemObjects = Start-PathTruncations $collectionOfTruncableObjects $Logger $beVerbose
 
     If ($deleteRecycleBin -eq $true) {
-        Delete-RecycleBin $logFilePath $beVerbose
+        Delete-RecycleBin $Logger
     }
 
     If ($startDiskCleanupManager -eq $true) {
-        Start-DiskCleanupManager $logFilePath $beVerbose
+        Start-DiskCleanupManager $Logger
     }
     #  eo: manipulating the file system
 
@@ -555,14 +544,14 @@ Function Start-CleanUpSystem
 
     $statisticObject = Create-StatisticObject $runDatetime $numberOfRemovedFileSystemObjects $startDiskInformation $endDiskInformation
 
-    Write-DiskspaceLog $logFilePath $endDiskinformation $beVerbose
+    Write-DiskspaceLog $Logger $endDiskinformation
 
-    Write-StatisticLog $logFilePath $statisticObject $beVerbose
+    Write-StatisticLog $Logger $statisticObject
 
     #enable windows update service
     Get-Service -Name wuauserv | Start-Service -ErrorAction SilentlyContinue
 
-    Remove-LockFileOrExit $lockFilePath $logFilePath $beVerbose
+    Remove-LockFileOrExit $lockFilePath $Logger
     #eo: clean up
 }
 
@@ -570,13 +559,10 @@ Function Start-DiskCleanupManager {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
-        [string] $logFilePath,
-
-        [Parameter(Mandatory = $false)]
-        [bool] $beVerbose = $false
+        [Logger] $Logger
     )
 
-    Write-InfoLog $logFilePath ":: Starting system disk cleanup manager." $beVerbose
+    $Logger.Info(":: Starting system disk cleanup manager.")
 
     #@see: https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/cleanmgr
     If ($beVerbose -eq $true) {
@@ -585,7 +571,7 @@ Function Start-DiskCleanupManager {
         Start-Process -FilePath Cleanmgr -ArgumentList '/sagerun:1', '/verylowdisk' -Wait
     }
 
-    Write-InfoLog $logFilePath ":: Finished system disk cleanup manager." $beVerbose
+    $Logger.Info(":: Finished system disk cleanup manager.")
 }
 
 Function Start-PathTruncation {
@@ -604,13 +590,10 @@ Function Start-PathTruncation {
         [int]$checkForDuplicatesGreaterThanMegabyte,
 
         [Parameter(Mandatory = $true)]
-        [string]$logFilePath,
+        [Logger] $Logger,
 
         [Parameter(Mandatory = $true)]
         [int]$numberOfRemovedFileSystemObjects,
-
-        [Parameter(Mandatory = $false)]
-        [bool]$beVerbose = $false,
 
         [Parameter(Mandatory = $false)]
         [bool]$isDryRun = $false
@@ -628,31 +611,31 @@ Function Start-PathTruncation {
         #if path does not contain another wild card
         If (!$pathWithoutStarAtTheEnd.Contains('*')) {
             If (!(Test-Path $pathWithoutStarAtTheEnd)) {
-                Write-InfoLog $logFilePath "Path does not exist >>${path}<<. Skipping it." $beVerbose
+                $Logger.Info("Path does not exist >>${path}<<. Skipping it.")
                 $processPath = $false
             }
         }
     } Else {
         If (!(Test-Path $path)) {
-            Write-InfoLog $logFilePath "Path does not exist >>${path}<<. Skipping it." $beVerbose
+            $Logger.Info("Path does not exist >>${path}<<. Skipping it.")
             $processPath = $false
         }
     }
 
     If ($processPath) {
-        Write-InfoLog $logFilePath "Truncating path >>${path}<< with days to keep files older than >>${daysToKeepOldFile}<< days." $beVerbose
+        $Logger.Info("Truncating path >>${path}<< with days to keep files older than >>${daysToKeepOldFile}<< days.")
 
         #if we have to check against last modification date
         If ($daysToKeepOldFile -ne 0) {
             $lastPossibleDate = (Get-Date).AddDays(-$daysToKeepOldFile)
-            Write-InfoLog $logFilePath "   Removing entries older than >>${lastPossibleDate}<<." $beVerbose
+            $Logger.Info("   Removing entries older than >>${lastPossibleDate}<<.")
 
             $matchingItems = Get-ChildItem -Path "$path" -Recurse -ErrorAction SilentlyContinue | 
                 Where-Object LastWriteTime -lt $lastPossibleDate
 
             $numberOfItemsToRemove = $matchingItems.Count
 
-            Write-InfoLog $logFilePath "   Removing >>${numberOfItemsToRemove}<< entries." $beVerbose
+            $Logger.Info("   Removing >>${numberOfItemsToRemove}<< entries.")
 
             ForEach ($matchingItem In $matchingItems) {
                 If ($DisplayProgessBar -eq $true){
@@ -666,11 +649,11 @@ Function Start-PathTruncation {
 
                 $FullQualifiedPath = Join-Path -Path $pathWithoutStarAtTheEnd -ChildPath $matchingItem
 
-                Remove-ItemAndLogResult "${FullQualifiedPath}" $true $logFilePath $beVerbose $isDryRun
+                Remove-ItemAndLogResult "${FullQualifiedPath}" $true $Logger $isDryRun
                 ++$numberOfRemovedFileSystemObjects
             }
         } Else {
-            Write-InfoLog $logFilePath "   Removing all entries, no date limit provided." $beVerbose
+            $Logger.Info("   Removing all entries, no date limit provided.")
 
             $matchingItems = Get-ChildItem -Path "$path" -Recurse -ErrorAction SilentlyContinue
 
@@ -684,10 +667,10 @@ Function Start-PathTruncation {
                     -ParentId 0
                 ++$ProcessedFileItemCounter
             }
-            Write-InfoLog $logFilePath "   Removing >>${numberOfItemsToRemove}<< entries." $beVerbose
+            $Logger.Info("   Removing >>${numberOfItemsToRemove}<< entries.")
             
             $FullQualifiedPath = Join-Path -Path $pathWithoutStarAtTheEnd -ChildPath $matchingItem
-            Remove-ItemAndLogResult "${FullQualifiedPath}" $true $logFilePath $beVerbose $isDryRun
+            Remove-ItemAndLogResult "${FullQualifiedPath}" $true $Logger $isDryRun
             ++$numberOfRemovedFileSystemObjects
         }
 
@@ -695,7 +678,7 @@ Function Start-PathTruncation {
             $listOfFileHashToFilePath = @{}
             $matchingFileSizeInByte = $checkForDuplicatesGreaterThanMegabyte * 1048576 #1048576 = 1024*1024
 
-            Write-DebugLog $logFilePath "Checking for duplicates with file size greater than >>${matchingFileSizeInByte}<< bytes." $beVerbose
+            $Logger.Debug("Checking for duplicates with file size greater than >>${matchingFileSizeInByte}<< bytes.")
 
             $matchingItems = Get-ChildItem -Path "$path" -Recurse -File -ErrorAction SilentlyContinue | 
                 Where-Object Length -ge $matchingFileSizeInByte
@@ -703,11 +686,11 @@ Function Start-PathTruncation {
             $numberOfItemsToRemove = $matchingItems.Count
 
             If ($matchingItems.Count -gt 1 ) {
-                Write-InfoLog $logFilePath "   Checking >>${numberOfItemsToRemove}<< entries of being duplicates." $beVerbose
+                $Logger.Info("   Checking >>${numberOfItemsToRemove}<< entries of being duplicates.")
 
                 ForEach ($matchingItem In $matchingItems) {
                     $filePathToMatchingItem = $("${path}\${matchingItem}")
-                    Write-DebugLog $logFilePath "   Processing matching item file path >>${filePathToMatchingItem}<<." $beVerbose
+                    $Logger.Debug("   Processing matching item file path >>${filePathToMatchingItem}<<.")
 
                     If (Test-Path -Path $filePathToMatchingItem) {
                         $fileHashObject = Get-FileHash -Path "$filePathToMatchingItem" -Algorithm SHA256
@@ -724,22 +707,22 @@ Function Start-PathTruncation {
                         }
 
                         If ($listOfFileHashToFilePath.ContainsKey($fileHash)) {
-                            Write-DebugLog $logFilePath "   Found duplicated hash >>${fileHash}<<, removing >>${filePathToMatchingItem}<<." $beVerbose
+                            $Logger.Debug("   Found duplicated hash >>${fileHash}<<, removing >>${filePathToMatchingItem}<<.")
 
                             $FullQualifiedPath = Join-Path -Path $pathWithoutStarAtTheEnd -ChildPath $matchingItem
-                            Remove-ItemAndLogResult "${FullQualifiedPath}" $true $logFilePath $beVerbose $isDryRun
+                            Remove-ItemAndLogResult "${FullQualifiedPath}" $true $Logger $isDryRun
                             ++$numberOfRemovedFileSystemObjects
                         } Else {
-                            Write-DebugLog $logFilePath "   Adding key >>${fileHash}<< with value >>${matchingItem}<<." $beVerbose
+                            $Logger.Debug("   Adding key >>${fileHash}<< with value >>${matchingItem}<<.")
 
                             $listOfFileHashToFilePath.Add($fileHash, $matchingItem)
                         }
                     } Else {
-                        Write-DebugLog $logFilePath "      Filepath is not valid." $beVerbose
+                        $Logger.Debug("      Filepath is not valid.")
                     }
                 }
             } Else {
-                Write-DebugLog $logFilePath "   Less than two matching entries in the collection. Skipping duplicate check." $beVerbose
+                $Logger.Debug("   Less than two matching entries in the collection. Skipping duplicate check.")
             }
         }
     }
@@ -754,7 +737,7 @@ Function Start-PathTruncations {
         [System.Collections.ArrayList]$collectionOfTruncableObjects,
 
         [Parameter(Mandatory = $true)]
-        [string] $logFilePath,
+        [Logger] $Logger,
 
         [Parameter(Mandatory = $false)]
         [bool] $beVerbose = $false
@@ -788,7 +771,7 @@ Function Start-PathTruncations {
                         -Id 0
                 }
                
-                $numberOfRemovedFileSystemObjects = Start-PathTruncation $currentUserDirectoryPath $currentObject.days_to_keep_old_file $currentObject.check_for_duplicates $currentObject.check_for_duplicates_greater_than_megabyte $logFilePath $numberOfRemovedFileSystemObjects $beVerbose $isDryRun
+                $numberOfRemovedFileSystemObjects = Start-PathTruncation $currentUserDirectoryPath $currentObject.days_to_keep_old_file $currentObject.check_for_duplicates $currentObject.check_for_duplicates_greater_than_megabyte $Logger $numberOfRemovedFileSystemObjects $isDryRun
             }
         } Else {
             If ($DisplayProgressBar -eq $true) {
@@ -799,7 +782,7 @@ Function Start-PathTruncations {
                     -Id 0
             }
 
-            $numberOfRemovedFileSystemObjects = Start-PathTruncation $CurrentObjectPath $currentObject.days_to_keep_old_file $currentObject.check_for_duplicates $currentObject.check_for_duplicates_greater_than_megabyte $logFilePath $numberOfRemovedFileSystemObjects $beVerbose $isDryRun
+            $numberOfRemovedFileSystemObjects = Start-PathTruncation $CurrentObjectPath $currentObject.days_to_keep_old_file $currentObject.check_for_duplicates $currentObject.check_for_duplicates_greater_than_megabyte $Logger $numberOfRemovedFileSystemObjects $isDryRun
         }
 
         ++$CurrentTruncableObjectCounter
