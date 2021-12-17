@@ -9,6 +9,81 @@
 # @author stev leibelt <artodeto@bazzline.net>
 ####
 
+Class Logger {
+    #bo properties
+    [bool]hidden $BeVerbose
+    [int]hidden $GlobalLogLevel
+    [string]hidden $Path
+    [int] static $LogLevelTrace = 0
+    [int] static $LogLevelDebug = 1
+    [int] static $LogLevelInformation = 2
+    [int] static $LogLevelWarning = 3
+    [int] static $LogLevelError = 4
+    [int] static $LogLevelCritical = 5
+    #eo properties
+
+    #bo functions
+    Logger (
+        [string] $Path,
+        [int] $GlobalLogLevel,
+        [bool] $BeVerbose
+    ) {
+        $this.BeVerbose = $BeVerbose
+        $this.GlobalLogLevel = $GlobalLogLevel
+        $this.Path = $Path
+    }
+
+    [void] Debug(
+        [string] $Message
+    ) {
+        $this.LogLine($Message, 0)
+    }
+
+    [void] Error(
+        [string] $Message
+    ) {
+        $this.LogLine($Message, 4)
+    }
+
+
+    [void] Info(
+        [string] $Message
+    ) {
+        $this.LogLine($Message, 2)
+    }
+
+    [void] LogLine(
+        [string] $Message,
+        [int] $LogLevel
+    ) {
+        If ($LogLevel -ge $this.GlobalLogLevel) {
+            $Prefix = "[None]"
+
+            Switch ($LogLevel)
+            {
+                0 { $Prefix = "[Trace]"; Break }
+                1 { $Prefix = "[Debug]"; Break }
+                2 { $Prefix = "[Information]"; Break }
+                3 { $Prefix = "[Warning]"; Break }
+                4 { $Prefix = "[Error]"; Break }
+                5 { $Prefix = "[Critical]"; Break }
+                Default { $Prefix = "[None]"; Break }
+            }
+
+            $CurrentDateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+
+            $CurrentLogLine = '{0}: {1} - {2}' -f $CurrentDateTime,$Prefix,$Message
+
+            Add-Content -Path $this.Path -Value $CurrentLogLine
+
+            If ($this.BeVerbose) {
+                Write-Host $CurrentLogLine -ForegroundColor DarkGray
+            }
+        }
+    }
+    #eo functions
+}
+
 Function Create-TruncableObject
 {
     [CmdletBinding()]
@@ -446,6 +521,9 @@ Function Start-CleanUpSystem
     }
 
     $logFilePath = Get-LogFilePath $logDirectoryPath
+    $Logger = [Logger]::new($LogFilePath, $globalLogLevel, $beVerbose)
+    $Logger.Info("ES GEHT!")
+    return
     #eo: variable definition
 
     #bo: clean up
