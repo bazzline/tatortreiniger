@@ -15,6 +15,20 @@
 #$logDirectoryPath = ($PSScriptRoot + "\log\")
 #eo: general variable section
 
+#bo: OS determination helper
+If ($host.Version.Major -lt 7) {
+    If (Test-Path "c:\windows") {
+        $IsLinux = $false
+        $IsWindows = $true
+    } ElseIf (Test-Path "/root") {
+        $IsLinux = $true
+        $IsWindows = $false
+    }
+}
+#eo: OS determination helper
+
+#bo: windows settings
+If ($IsWindows -eq $true) {
 #bo: path section
 ####
 #You can add paths in here
@@ -35,3 +49,4 @@
 #$collectionOfTruncableObjects.Add((New-TruncableObject 'c:\Users\$user\Downloads' 21 $true 32)) | Out-Null
 #  eo: user general
 #eo: path section
+}

@@ -9,124 +9,8 @@
 # @author stev leibelt <artodeto@bazzline.net>
 ####
 
-Class Logger {
-    #bo properties
-    hidden [bool] $BeVerbose
-    hidden [int] $GlobalLogLevel
-    hidden [string] $Path
-    #eo properties
-
-    #bo functions
-    Logger (
-        [string] $Path,
-        [int] $GlobalLogLevel,
-        [bool] $BeVerbose
-    ) {
-        $this.BeVerbose = $BeVerbose
-        $this.GlobalLogLevel = $GlobalLogLevel
-        $this.Path = $Path
-    }
-
-    [void] Debug(
-        [string] $Message
-    ) {
-        $this.LogLine($Message, 0)
-    }
-
-    [void] Error(
-        [string] $Message
-    ) {
-        $this.LogLine($Message, 4)
-    }
-
-
-    [void] Info(
-        [string] $Message
-    ) {
-        $this.LogLine($Message, 2)
-    }
-
-    [void] LogLine(
-        [string] $Message,
-        [int] $LogLevel
-    ) {
-        If ($LogLevel -ge $this.GlobalLogLevel) {
-            $Prefix = "[None]"
-
-            Switch ($LogLevel)
-            {
-                0 { $Prefix = "[Trace]"; Break }
-                1 { $Prefix = "[Debug]"; Break }
-                2 { $Prefix = "[Information]"; Break }
-                3 { $Prefix = "[Warning]"; Break }
-                4 { $Prefix = "[Error]"; Break }
-                5 { $Prefix = "[Critical]"; Break }
-                Default { $Prefix = "[None]"; Break }
-            }
-
-            $CurrentDateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-
-            $CurrentLogLine = '{0}: {1} - {2}' -f $CurrentDateTime,$Prefix,$Message
-
-            Add-Content -Path $this.Path -Value $CurrentLogLine
-
-            If ($this.BeVerbose) {
-                Write-Host $CurrentLogLine -ForegroundColor DarkGray
-            }
-        }
-    }
-    #eo functions
-}
-
-Class TruncableObject
-{
-    #bo properties
-    hidden [bool] $CheckForDuplicates
-    hidden [int] $CheckForDuplicatesGreaterThanMegabyte
-    hidden [int] $DaysToKeepOldFiles
-    hidden [string] $Path
-    #eo properties
-
-    #bo functions
-    TruncableObject (
-        [bool] $CheckForDuplicates,
-        [int] $CheckForDuplicatesGreaterThanMegabyte,
-        [int] $DaysToKeepOldFiles,
-        [string] $Path
-    ) {
-        $this.Path = $Path
-        $this.DaysToKeepOldFiles = $DaysToKeepOldFiles
-        $this.CheckForDuplicates = $CheckForDuplicates
-        $this.CheckForDuplicatesGreaterThanMegabyte = $CheckForDuplicatesGreaterThanMegabyte
-    }
-
-    [bool] Get-CheckForDuplicates()
-    {
-        return $this.CheckForDuplicates
-    }
-
-    [int] Get-CheckForDuplicatesGreaterThanMegabyte()
-    {
-        return $this.CheckForDuplicatesGreaterThanMegabyte
-    }
-
-    [int] Get-DaysToKeepOldFiles()
-    {
-        return $this.DaysToKeepOldFiles
-    }
-
-    [string] Get-Path()
-    {
-        return $this.Path
-    }
-
-    [void] Set-Path(
-        [string] $Path
-    ) {
-        $this.Path = $Path
-    }
-    #eo functions
-}
+using module .\source\Logger.psm1
+using module .\source\TruncableObject.psm1
 
 Function New-TruncableObject
 {
@@ -443,77 +327,127 @@ Function Write-StatisticLog
         -f $StatisticObject.disk.freed_up_disk_space, $StatisticObject.disk.number_of_removed_file_system_objects)
 }
 
+Class CleanUpSystem {
+    #bo properties
+    hidden [string] $CurrentDate
+    hidden [int] $CurrentExitCodeCounter
+    hidden [object] $CollectionOfMandatoryFilesToLoad
+    hidden [object] $CollectionOfOptionalFilesToLoad
+    hidden [Logger] $Logger
+    #eo properties
 
-Function Start-CleanUpSystem
-{
-    #bo: variable definition
-    $currentDate = Get-Date -Format "yyyyMMdd"
-    $collectionOfTruncableObjects = New-Object System.Collections.ArrayList
-    $globalConfigurationFilePath = ($PSScriptRoot + "\data\globalConfiguration.ps1")
-    $localConfigurationFilePath = ($PSScriptRoot + "\data\localConfiguration.ps1")
+    #bo functions
+    CleanUpSystem (
+        [Logger] $Logger
+    ) {
+        $this.Logger = $Logger
+        $this.CurrentDate = Get-Date -Format "yyyyMMdd"
+        $this.CollectionOfMandatoryFilesToLoad = New-Object System.Collections.ArrayList
+        $this.CollectionOfOptionalFilesToLoad = New-Object System.Collections.ArrayList
+        $this.CurrentExitCodeCounter = 1
 
-    #We have to source the files here and not via a function.
-    #  If we would source the files via a function, the sourced in variables would exist in the scope of the function only.
-    If ((Test-Path $globalConfigurationFilePath)) {
-        . $globalConfigurationFilePath
-    } Else {
-        Write-Error "Could not find path to global configuration >>${globalConfigurationFilePath}<<. Global configuration is mandatory!"
-        Exit ($CurrentExitCodeCounter++)
+        $this.CollectionOfMandatoryFilesToLoad.Add($PSScriptRoot + "\data\globalConfiguration.ps1")
+        $this.CollectionOfOptionalFilesToLoad.Add($PSScriptRoot + "\data\localConfiguration.ps1")
     }
 
-    #we are creating a logger to have at least one running
-    $logFilePath = Get-LogFilePath $logDirectoryPath
-    $Logger = [Logger]::new($LogFilePath, $globalLogLevel, $beVerbose)
+    [void] ConfigureLogger(
+        [string] $Path
+    ) {
+        If (!(Test-Path $Path)) {
+            New-Item -ItemType Directory -Force -Path $Path
+        }
 
-    If ((Test-Path $localConfigurationFilePath)) {
-        . $localConfigurationFilePath
-    } Else {
-        $Logger.Info("Could not find path to local configuration >>${localConfigurationFilePath}<<. This run withouts local configuration!")
+        $Date = Get-Date -Format "yyyyMMdd"
+        $FileName = '{0}_{1}.log' -f [System.Net.Dns]::GetHostName(),$Date
+        $FilePath = Join-Path $Path -ChildPath $FileName
+
+        $this.Logger.SetPath($FilePath)
     }
 
-    #we have to create a second instance since there is a chance that one of the three variables have been changed
-    $logFilePath = Get-LogFilePath $logDirectoryPath
-    $Logger = [Logger]::new($logFilePath, $globalLogLevel, $beVerbose)
-    #eo: variable definition
+    [void] Start ()
+    {
+        #bo runtime properties
+        #   each of the following properites can be overwritten from the optional local configuration
+        $beVerbose = $false
+        $collectionOfTruncableObjects = New-Object System.Collections.ArrayList
+        $deleteRecycleBin = $false #you should use a GPO for this but if you can't just empty the trash bin on each run
+        $globalLogLevel = 0  #@see: https://docs.microsoft.com/en-us/dotnet/api/microsoft.extensions.logging.loglevel?view=dotnet-plat-ext-5.0
+        $lockFilePath = Join-Path -Path "$PSScriptRoot" -ChildPath "data" -AdditionalChildPath ([System.Net.Dns]::GetHostName() + "-CleanUpSystem.lock")
+        $logDirectoryPath = Join-Path -Path "$PSScriptRoot" -ChildPath "data" -AdditionalChildPath "log"
+        $isDryRun = $false
 
-    #bo: clean up
-    $startDateTime = (Get-Date)
-    $startDiskInformation = Create-DiskInformation
+        #we first set the global configuration settings
+        $this.Logger.SetBeVerbose($beVerbose)
+        $this.Logger.SetGlobalLogLevel($globalLogLevel)
+        $this.ConfigureLogger($logDirectoryPath)
+        #eo runtime properties
 
-    New-LockFileOrExit $lockFilePath $Logger
+        #We have to source the files here and not via a function.
+        #  If we would source the files via a function, the sourced in variables would exist in the scope of the function only.
+        ForEach ($CurrentFilePath in $this.CollectionOfMandatoryFilesToLoad) {
+            If ((Test-Path $CurrentFilePath)) {
+                . $CurrentFilePath
+            } Else {
+                Write-Error "Could not load file. Path is invalid >>${CurrentFilePath}<<. Path is declared as mandatory."
+                Exit ($this.CurrentExitCodeCounter++)
+            }
+        }
 
-    Write-DiskspaceLog $Logger $startDiskInformation
+        ForEach ($CurrentFilePath in $this.CollectionOfOptionalFilesToLoad) {
+            If ((Test-Path $CurrentFilePath)) {
+                . $CurrentFilePath
+            } Else {
+                $this.Logger.Info("Could not load file. to Path is invalid >>${CurrentFilePath}<<. Path is decleared as optional.")
+            }
+        }
 
-    #disable windows update service to enable cleanup of >>c:\windows\softwaredistribution<<
-    Get-Service -Name wuauserv | Stop-Service -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue -Verbose
+        #and now, we set the variables, possible overwritten by local configration files
+        $this.Logger.SetBeVerbose($beVerbose)
+        $this.Logger.SetGlobalLogLevel($globalLogLevel)
+        $this.ConfigureLogger($logDirectoryPath)
+        #eo: variable definition
 
-    #  bo: manipulating the file system
-    $numberOfRemovedFileSystemObjects = Start-PathTruncations $collectionOfTruncableObjects $Logger $beVerbose
+        #----
+        #bo: clean up
+        $startDateTime = (Get-Date)
+        $startDiskInformation = Create-DiskInformation
 
-    If ($deleteRecycleBin -eq $true) {
-        Delete-RecycleBin $Logger
+        New-LockFileOrExit $lockFilePath $this.Logger
+
+        Write-DiskspaceLog $this.Logger $startDiskInformation
+
+        #disable windows update service to enable cleanup of >>c:\windows\softwaredistribution<<
+        Get-Service -Name wuauserv | Stop-Service -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue -Verbose
+
+        #  bo: manipulating the file system
+        $numberOfRemovedFileSystemObjects = Start-PathTruncations $collectionOfTruncableObjects $this.Logger $beVerbose
+
+        If ($deleteRecycleBin -eq $true) {
+            Delete-RecycleBin $this.Logger
+        }
+
+        If ($startDiskCleanupManager -eq $true) {
+            Start-DiskCleanupManager $this.Logger
+        }
+        #  eo: manipulating the file system
+
+        $runDateTime = (Get-Date).Subtract($startDateTime)
+
+        $endDiskInformation = Create-DiskInformation
+
+        $statisticObject = Create-StatisticObject $runDatetime $numberOfRemovedFileSystemObjects $startDiskInformation $endDiskInformation
+
+        Write-DiskspaceLog $this.Logger $endDiskinformation
+
+        Write-StatisticLog $this.Logger $statisticObject
+
+        #enable windows update service
+        Get-Service -Name wuauserv | Start-Service -ErrorAction SilentlyContinue
+
+        Remove-LockFileOrExit $lockFilePath $this.Logger
+        #eo: clean up
     }
-
-    If ($startDiskCleanupManager -eq $true) {
-        Start-DiskCleanupManager $Logger
-    }
-    #  eo: manipulating the file system
-
-    $runDateTime = (Get-Date).Subtract($startDateTime)
-
-    $endDiskInformation = Create-DiskInformation
-
-    $statisticObject = Create-StatisticObject $runDatetime $numberOfRemovedFileSystemObjects $startDiskInformation $endDiskInformation
-
-    Write-DiskspaceLog $Logger $endDiskinformation
-
-    Write-StatisticLog $Logger $statisticObject
-
-    #enable windows update service
-    Get-Service -Name wuauserv | Start-Service -ErrorAction SilentlyContinue
-
-    Remove-LockFileOrExit $lockFilePath $Logger
-    #eo: clean up
+    #eo functions
 }
 
 Function Start-DiskCleanupManager {
@@ -556,33 +490,33 @@ Function Start-PathTruncation {
     $ProcessedFileItemCounter = 1
 
     #if path ends with >>\*<<
-    $pathEndsWithAStar = ($TruncableObject.Get-Path() -match '\\\*$')
+    $pathEndsWithAStar = ($TruncableObject.GetPath() -match '\\\*$')
     $pathWithoutStarAtTheEnd = $path.Substring(0, $path.Length-1)
 
     If ($pathEndsWithAStar) {
         #if path does not contain another wild card
         If (!$pathWithoutStarAtTheEnd.Contains('*')) {
             If (!(Test-Path $pathWithoutStarAtTheEnd)) {
-                $Logger.Info("Path does not exist >>" + $TruncableObject.Get-Path() + "<<. Skipping it.")
+                $Logger.Info("Path does not exist >>" + $TruncableObject.GetPath() + "<<. Skipping it.")
                 $ProcessPath = $false
             }
         }
     } Else {
-        If (!(Test-Path $TruncableObject.Get-Path())) {
-            $Logger.Info("Path does not exist >>" + $TruncableObject.Get-Path() + "<<. Skipping it.")
+        If (!(Test-Path $TruncableObject.GetPath())) {
+            $Logger.Info("Path does not exist >>" + $TruncableObject.GetPath() + "<<. Skipping it.")
             $ProcessPath = $false
         }
     }
 
     If ($ProcessPath) {
-        $Logger.Info("Truncating path >>" + $TruncableObject.Get-Path() + "<< with days to keep files older than >>" + $TruncableObject.Get-DaysToKeepOldFiles() + "<< days.")
+        $Logger.Info("Truncating path >>" + $TruncableObject.GetPath() + "<< with days to keep files older than >>" + $TruncableObject.GetDaysToKeepOldFiles() + "<< days.")
 
         #if we have to check against last modification date
-        If ($TruncableObject.Get-DaysToKeepOldFiles() -ne 0) {
-            $lastPossibleDate = (Get-Date).AddDays(-$TruncableObject.Get-DaysToKeepOldFiles())
+        If ($TruncableObject.GetDaysToKeepOldFiles() -ne 0) {
+            $lastPossibleDate = (Get-Date).AddDays(-$TruncableObject.GetDaysToKeepOldFiles())
             $Logger.Info("   Removing entries older than >>${lastPossibleDate}<<.")
 
-            $matchingItems = Get-ChildItem -Path $TruncableObject.Get-Path() -Recurse -ErrorAction SilentlyContinue | 
+            $matchingItems = Get-ChildItem -Path $TruncableObject.GetPath() -Recurse -ErrorAction SilentlyContinue |
                 Where-Object LastWriteTime -lt $lastPossibleDate
 
             $numberOfItemsToRemove = $matchingItems.Count
@@ -607,7 +541,7 @@ Function Start-PathTruncation {
         } Else {
             $Logger.Info("   Removing all entries, no date limit provided.")
 
-            $matchingItems = Get-ChildItem -Path $TruncableObject.Get-Path() -Recurse -ErrorAction SilentlyContinue
+            $matchingItems = Get-ChildItem -Path $TruncableObject.GetPath() -Recurse -ErrorAction SilentlyContinue
 
             $numberOfItemsToRemove = $matchingItems.Count
             
@@ -626,13 +560,13 @@ Function Start-PathTruncation {
             ++$numberOfRemovedFileSystemObjects
         }
 
-        If ($TruncableObject.Get-CheckForDuplicates()) {
+        If ($TruncableObject.CheckForDuplicates()) {
             $listOfFileHashToFilePath = @{}
-            $matchingFileSizeInByte = $TruncableObject.Get-CheckForDuplicatesGreaterThanMegabyte() * 1048576 #1048576 = 1024*1024
+            $matchingFileSizeInByte = $TruncableObject.GetCheckForDuplicatesGreaterThanMegabyte() * 1048576 #1048576 = 1024*1024
 
             $Logger.Debug("Checking for duplicates with file size greater than >>${matchingFileSizeInByte}<< bytes.")
 
-            $matchingItems = Get-ChildItem -Path $TruncableObject.Get-Path() -Recurse -File -ErrorAction SilentlyContinue | 
+            $matchingItems = Get-ChildItem -Path $TruncableObject.GetPath() -Recurse -File -ErrorAction SilentlyContinue |
                 Where-Object Length -ge $matchingFileSizeInByte
 
             $numberOfItemsToRemove = $matchingItems.Count
@@ -641,7 +575,7 @@ Function Start-PathTruncation {
                 $Logger.Info("   Checking >>${numberOfItemsToRemove}<< entries of being duplicates.")
 
                 ForEach ($matchingItem In $matchingItems) {
-                    $filePathToMatchingItem = $($TruncableObject.Get-Path() + "\${matchingItem}")
+                    $filePathToMatchingItem = $($TruncableObject.GetPath() + "\${matchingItem}")
                     $Logger.Debug("   Processing matching item file path >>${filePathToMatchingItem}<<.")
 
                     If (Test-Path -Path $filePathToMatchingItem) {
@@ -709,7 +643,7 @@ Function Start-PathTruncations {
 
     ForEach ($CurrentTruncableObject In $CollectionOfTruncableObjects) {
 
-        $CurrentObjectPath = $CurrentTruncableObject.Get-Path()
+        $CurrentObjectPath = $CurrentTruncableObject.GetPath()
 
         #check if path ends with a wildcard
         If ($CurrentObjectPath -match '\$user') {
@@ -724,7 +658,7 @@ Function Start-PathTruncations {
                         -Id 0
                 }
 
-                $CurrentTruncableObject.Set-Path($CurrentUserDirectoryPath)
+                $CurrentTruncableObject.SetPath($CurrentUserDirectoryPath)
                
                 $NumberOfRemovedFileSystemObjects = Start-PathTruncation $CurrentTruncableObject $Logger $numberOfRemovedFileSystemObjects $isDryRun
             }
@@ -750,4 +684,7 @@ Function Start-PathTruncations {
     Return $NumberOfRemovedFileSystemObjects
 }
 
-Start-CleanUpSystem
+$CleanUpSystem = [CleanUpSystem]::new(
+    [Logger]::new()
+)
+$CleanUpSystem.Start()

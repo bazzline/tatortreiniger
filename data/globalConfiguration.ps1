@@ -9,14 +9,6 @@
 # @author stev leibelt <artodeto@bazzline.net>
 ####
 
-#bo: os independent settings
-$beVerbose = $false
-$CurrentExitCodeCounter = 0
-#$globalLogLevel = 0  #@see: https://docs.microsoft.com/en-us/dotnet/api/microsoft.extensions.logging.loglevel?view=dotnet-plat-ext-5.0
-$deleteRecycleBin = $false #you should use a GPO for this but if you can't just empty the trash bin on each run
-$isDryRun = $false
-#eo: os independent settings
-
 #bo: OS determination helper
 If ($host.Version.Major -lt 7) {
     If (Test-Path "c:\windows") {
@@ -32,8 +24,6 @@ If ($host.Version.Major -lt 7) {
 #bo: windows settings
 If ($IsWindows -eq $true) {
     #bo: general variable section
-    $lockFilePath = ($PSScriptRoot + "\" + $env:computername + "-CleanUpSystem.lock")
-    $logDirectoryPath = ($PSScriptRoot + "\log\")
     $startDiskCleanupManager = $true #if set to $true, cleanmgr will be started
     #eo: general variable section
 
@@ -124,5 +114,7 @@ If ($IsWindows -eq $true) {
     #  bo: user general
     #  eo: user general
     #eo: path section
+} ElseIf ($IsLinux -eq $true) {
+    $collectionOfTruncableObjects.Add((New-TruncableObject '/home/$user/.cache/*' 28)) | Out-Null
 }
 #eo: windows settings
