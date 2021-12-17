@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### To Change
 
+* Implement usage of [Resolve-Path](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.management/resolve-path?view=powershell-7.2)
 * fix not working calculated values of free'ed up disk space by using [Measure-Object](http://woshub.com/powershell-get-folder-sizes/)
 * read [this](https://docs.microsoft.com/en-us/powershell/scripting/learn/deep-dives/everything-about-arrays?view=powershell-7.1)
     * and [this](https://powershellexplained.com/2017-05-27-Powershell-module-building-basics/)
