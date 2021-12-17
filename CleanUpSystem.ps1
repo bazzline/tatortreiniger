@@ -11,15 +11,9 @@
 
 Class Logger {
     #bo properties
-    [bool]hidden $BeVerbose
-    [int]hidden $GlobalLogLevel
-    [string]hidden $Path
-    [int] static $LogLevelTrace = 0
-    [int] static $LogLevelDebug = 1
-    [int] static $LogLevelInformation = 2
-    [int] static $LogLevelWarning = 3
-    [int] static $LogLevelError = 4
-    [int] static $LogLevelCritical = 5
+    hidden [bool] $BeVerbose
+    hidden [int] $GlobalLogLevel
+    hidden [string] $Path
     #eo properties
 
     #bo functions
@@ -84,26 +78,48 @@ Class Logger {
     #eo functions
 }
 
-Function Create-TruncableObject
+Class TruncableObject
 {
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$path,
+    #bo properties
+    hidden [bool] $CheckForDuplicates
+    hidden [int] $CheckForDuplicatesGreaterThanMegabyte
+    hidden [int] $DaysToKeepOldFiles
+    hidden [string] $Path
+    #eo properties
 
-        [Parameter(Mandatory = $false)]
-        [int]$daysToKeepOldFiles = 1,
+    #bo functions
+    TruncableObject (
+        [bool] $CheckForDuplicates,
+        [int] $CheckForDuplicatesGreaterThanMegabyte,
+        [int] $DaysToKeepOldFiles,
+        [string] $Path
+    ) {
+        $this.Path = $Path
+        $this.DaysToKeepOldFiles = $DaysToKeepOldFiles
+        $this.CheckForDuplicates = $CheckForDuplicates
+        $this.CheckForDuplicatesGreaterThanMegabyte = $CheckForDuplicatesGreaterThanMegabyte
+    }
 
-        [Parameter(Mandatory = $false)]
-        [bool]$checkForDuplicates = $false,
+    [bool] Get-CheckForDuplicates()
+    {
+        return $this.CheckForDuplicates
+    }
 
-        [Parameter(Mandatory = $false)]
-        [int]$checkForDuplicatesGreaterThanMegabyte = 64
-    )
+    [bool] Get-CheckForDuplicatesGreaterThanMegabyte()
+    {
+        return $this.CheckForDuplicatesGreaterThanMegabyte
+    }
 
-    Write-Host ":: Please update your configuration. >>Create-TruncableObject<< is deprecarted and has to be replaced with >>New-TruncableObject<<. This function will be deleted at 31.12.2021."
+    [bool] Get-DaysToKeepOldFiles()
+    {
+        return $this.DaysToKeepOldFiles
+    }
 
-    New-TruncableObject $path $daysToKeepOldFiles $checkForDuplicates $checkForDuplicatesGreaterThanMegabyte
+    [string] Get-Path()
+    {
+        return $this.Path
+    }
+    #eo functions
 }
 
 Function New-TruncableObject
@@ -111,27 +127,24 @@ Function New-TruncableObject
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
-        [string]$path,
+        [string] $Path,
 
         [Parameter(Mandatory = $false)]
-        [int]$daysToKeepOldFiles = 1,
+        [int] $DaysToKeepOldFiles = 1,
 
         [Parameter(Mandatory = $false)]
-        [bool]$checkForDuplicates = $false,
+        [bool] $CheckForDuplicates = $false,
 
         [Parameter(Mandatory = $false)]
-        [int]$checkForDuplicatesGreaterThanMegabyte = 64
+        [int] $CheckForDuplicatesGreaterThanMegabyte = 64
     )
 
-    $properties = @{
-        path = $path
-        days_to_keep_old_file = $daysToKeepOldFiles
-        check_for_duplicates = $checkForDuplicates
-        check_for_duplicates_greater_than_megabyte = $checkForDuplicatesGreaterThanMegabyte
-    }
-    $object = New-Object psobject -Property $properties
-
-    return $object
+    return [TruncableObject]::new(
+        $CheckForDuplicates,
+        $CheckForDuplicatesGreaterThanMegabyte,
+        $DaysToKeepOldFiles,
+        $Path
+    )
 }
 
 Function New-LockFileOrExit {
@@ -520,16 +533,10 @@ Function Start-PathTruncation {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
-        [string]$path,
+        [string] $path,
 
         [Parameter(Mandatory = $true)]
-        [int]$daysToKeepOldFile,
-
-        [Parameter(Mandatory = $true)]
-        [bool]$checkForDuplicates,
-
-        [Parameter(Mandatory = $true)]
-        [int]$checkForDuplicatesGreaterThanMegabyte,
+        [TruncableObject] $TruncableObject,
 
         [Parameter(Mandatory = $true)]
         [Logger] $Logger,
@@ -565,11 +572,11 @@ Function Start-PathTruncation {
     }
 
     If ($processPath) {
-        $Logger.Info("Truncating path >>${path}<< with days to keep files older than >>${daysToKeepOldFile}<< days.")
+        $Logger.Info("Truncating path >>${path}<< with days to keep files older than >>" + $TruncableObject.Get-DaysToKeepOldFiles() + "<< days.")
 
         #if we have to check against last modification date
-        If ($daysToKeepOldFile -ne 0) {
-            $lastPossibleDate = (Get-Date).AddDays(-$daysToKeepOldFile)
+        If ($TruncableObject.Get-DaysToKeepOldFiles() -ne 0) {
+            $lastPossibleDate = (Get-Date).AddDays(-$TruncableObject.Get-DaysToKeepOldFiles())
             $Logger.Info("   Removing entries older than >>${lastPossibleDate}<<.")
 
             $matchingItems = Get-ChildItem -Path "$path" -Recurse -ErrorAction SilentlyContinue | 
@@ -616,9 +623,9 @@ Function Start-PathTruncation {
             ++$numberOfRemovedFileSystemObjects
         }
 
-        If ($checkForDuplicates) {
+        If ($TruncableObject.Get-CheckForDuplicates()) {
             $listOfFileHashToFilePath = @{}
-            $matchingFileSizeInByte = $checkForDuplicatesGreaterThanMegabyte * 1048576 #1048576 = 1024*1024
+            $matchingFileSizeInByte = $TruncableObject.Get-CheckForDuplicatesGreaterThanMegabyte() * 1048576 #1048576 = 1024*1024
 
             $Logger.Debug("Checking for duplicates with file size greater than >>${matchingFileSizeInByte}<< bytes.")
 

@@ -58,6 +58,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
+* Refactored TruncableObject by replacing object by a real class
 * Changed output of `$user` path. Instead of keeping `$user`, now user path is displayed
 * Refactored way how we write logs by replacing `Write-[Info|Debug|Error]Log` with `Logger.[Info|Debug|Error]` calls
 * Found and fixed a bug when dealing with files for paths like `\foo\bar\*`
