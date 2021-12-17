@@ -287,54 +287,6 @@ Function Write-LogMessage {
     }
 }
 
-Function Write-DebugLog {
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$path,
-
-        [Parameter(Mandatory = $true)]
-        [string]$message,
-
-        [Parameter(Mandatory = $false)]
-        [bool]$beVerbose = $false
-    )
-
-    Write-LogMessage $path $message 1 $beVerbose
-}
-
-Function Write-InfoLog {
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$path,
-
-        [Parameter(Mandatory = $true)]
-        [string]$message,
-
-        [Parameter(Mandatory = $false)]
-        [bool]$beVerbose = $false
-    )
-
-    Write-LogMessage $path $message 2 $beVerbose
-}
-
-Function Write-ErrorLog {
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$path,
-
-        [Parameter(Mandatory = $true)]
-        [string]$message,
-
-        [Parameter(Mandatory = $false)]
-        [bool]$beVerbose = $false
-    )
-
-    Write-LogMessage $path $message 4 $beVerbose
-}
-
 Function Write-ErrorLogAndExit {
     [CmdletBinding()]
     param(
@@ -441,19 +393,14 @@ Function Write-DiskspaceLog {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
-        [string]$path,
+        [Logger] $Logger,
 
         [Parameter(Mandatory = $true)]
-        [object]$diskInformation,
-
-        [Parameter(Mandatory = $false)]
-        [bool]$beVerbose = $false
+        [object] $DiskInformation
     )
 
-    $message = "Drive: {0}, Total Size (GB) {1}, Free Size (GB) {2}, Free size in percentage {3}" `
-        -f $diskInformation.device_id, $diskInformation.total_size_in_gb, $diskInformation.free_size_in_gb, $diskInformation.free_size_in_percentage
-
-    Write-InfoLog $path $message $beVerbose
+    $Logger.Info("Drive: {0}, Total Size (GB) {1}, Free Size (GB) {2}, Free size in percentage {3}" `
+        -f $DiskInformation.device_id, $DiskInformation.total_size_in_gb, $DiskInformation.free_size_in_gb, $DiskInformation.free_size_in_percentage)
     
 }
 
@@ -462,24 +409,19 @@ Function Write-StatisticLog
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
-        [string]$path,
+        [Logger] $Logger,
 
         [Parameter(Mandatory = $true)]
-        [object]$statisticObject,
-
-        [Parameter(Mandatory = $false)]
-        [bool]$beVerbose = $false
+        [object] $StatisticObject
     )
 
-    Write-InfoLog $path ":: Statistics ::" $beVerbose
+    $Logger.Info(":: Statistics ::")
 
-    $message = "   Runtime: Hours >>{0}<<, Minutes >>{1}<<, Seconds >>{2}<<." `
-        -f $statisticObject.runtime.hours, $statisticObject.runtime.minutes, $statisticObject.runtime.seconds
-    Write-InfoLog $path $message $beVerbose
+    $Logger.Info("   Runtime: Hours >>{0}<<, Minutes >>{1}<<, Seconds >>{2}<<." `
+        -f $StatisticObject.runtime.hours, $StatisticObject.runtime.minutes, $StatisticObject.runtime.seconds)
 
-    $message = "   Freed up disk space >>{0}<< Number of removed file system objects >>{1}<<." `
-        -f $statisticObject.disk.freed_up_disk_space, $statisticObject.disk.number_of_removed_file_system_objects
-    Write-InfoLog $path $message $beVerbose
+    $Logger.Info("   Freed up disk space >>{0}<< Number of removed file system objects >>{1}<<." `
+        -f $StatisticObject.disk.freed_up_disk_space, $StatisticObject.disk.number_of_removed_file_system_objects)
 }
 
 

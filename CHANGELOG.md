@@ -45,6 +45,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
+* Added dedicated Logger class
 * Added more cache paths of applications
 * Added `Clear-Host` at the end of the last `Start-PathTruncations` to refresh screen and remove the last progress bar
 * Added exit statement if global configuration file can not be loaded
@@ -58,6 +59,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 
 * Changed output of `$user` path. Instead of keeping `$user`, now user path is displayed
+* Refactored way how we write logs by replacing `Write-[Info|Debug|Error]Log` with `Logger.[Info|Debug|Error]` calls
 * Found and fixed a bug when dealing with files for paths like `\foo\bar\*`
     * The path with the `*` was used so there was never a chance this exact file (matching item) could be removed
     * This fixes also not deleted files in the section of duplicate checks
