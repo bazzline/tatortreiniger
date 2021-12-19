@@ -9,6 +9,7 @@
 # @author stev leibelt <artodeto@bazzline.net>
 ####
 
+using module .\source\DiskInformation.psm1
 using module .\source\Logger.psm1
 using module .\source\TruncableObject.psm1
 
@@ -99,24 +100,6 @@ Function Remove-LockFileOrExit {
     }
 }
 
-
-Function Get-LogFilePath {
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$path
-    )
-
-    If (!(Test-Path $path)) {
-        New-Item -ItemType Directory -Force -Path $path
-    }
-
-    $date = Get-Date -Format "yyyyMMdd"
-    $pathToTheLogFile = '{0}\{1}_{2}.log' -f $path,$env:computername,$date
-
-    return $pathToTheLogFile
-}
-
 Function Remove-ItemAndLogResult {
     [CmdletBinding()]
     param(
@@ -152,44 +135,6 @@ Function Remove-ItemAndLogResult {
     }
 }
 
-Function Write-LogMessage {
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$path,
-
-        [Parameter(Mandatory = $true)]
-        [string]$message,
-
-        [Parameter(Mandatory = $true)]
-        [int]$logLevel = 3,
-
-        [Parameter(Mandatory = $false)]
-        [bool]$beVerbose = $false
-    )
-
-    If ($logLevel -ge $globalLogLevel) {
-        Switch ($logLevel) {
-            0 { $prefix = "[Trace]" }
-            1 { $prefix = "[Debug]" }
-            2 { $prefix = "[Information]" }
-            3 { $prefix = "[Warning]" }
-            4 { $prefix = "[Error]" }
-            5 { $prefix = "[Critical]" }
-            default { $prefix = "[None]" }
-        }
-        $dateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-
-        $logLine = '{0}: {1} - {2}' -f $dateTime,$prefix,$message
-
-        Add-Content -Path $path -Value $logLine
-
-        If ($beVerbose) {
-            Write-Host $logLine -ForegroundColor DarkGray
-        }
-    }
-}
-
 Function Write-ErrorLogAndExit {
     [CmdletBinding()]
     param(
@@ -208,26 +153,6 @@ Function Write-ErrorLogAndExit {
     Exit $ExitCode
 }
 
-Function Create-DiskInformation 
-{
-
-    $logicalDisk = Get-WmiObject Win32_LogicalDisk | Where-Object { $_.DriveType -eq "3" }
-
-    $totalSizeInGB = "{0:N1}" -f ( $logicalDisk.Size / 1gb)
-    $freeSizeInGB = "{0:N1}" -f ( $logicalDisk.Freespace / 1gb )
-    $freeSizeInPercentage = "{0:P1}" -f ( $logicalDisk.FreeSpace / $logicalDisk.Size )
-
-    $properties = @{
-        device_id = $logicalDisk.DeviceId
-        total_size_in_gb = $totalSizeInGb
-        free_size_in_gb = $freeSizeInGB
-        free_size_in_percentage = $freeSizeInPercentage
-    }
-    $object = New-Object psobject -Property $properties
-
-    return $object
-}
-
 Function Create-StatisticObject {
     [CmdletBinding()]
     param(
@@ -238,13 +163,13 @@ Function Create-StatisticObject {
         [int]$numberOfRemovedFileSystemObjects,
 
         [Parameter(Mandatory = $true)]
-        [object]$startDiskInformation,
+        [DiskInformation] $startDiskInformation,
 
         [Parameter(Mandatory = $true)]
-        [object]$endDiskInformation
+        [DiskInformation] $endDiskInformation
     )
 
-    $startFreeSizeInGB = $startDiskInformation.free_size_in_gb -replace ",", "."
+    $startFreeSizeInGB = $startDiskInformation.GetFreeSizeInGB -replace ",", "."
     $endFreeSizeInGB = $endDiskInformation.free_size_in_gb -replace ",", "."
 
     $properties = @{
@@ -299,7 +224,7 @@ Function Write-DiskspaceLog {
         [Logger] $Logger,
 
         [Parameter(Mandatory = $true)]
-        [object] $DiskInformation
+        [DiskInformation] $DiskInformation
     )
 
     $Logger.Info("Drive: {0}, Total Size (GB) {1}, Free Size (GB) {2}, Free size in percentage {3}" `
@@ -333,14 +258,18 @@ Class CleanUpSystem {
     hidden [int] $CurrentExitCodeCounter
     hidden [object] $CollectionOfMandatoryFilesToLoad
     hidden [object] $CollectionOfOptionalFilesToLoad
+    hidden [DiskInformation] $DiskInformation
     hidden [Logger] $Logger
     #eo properties
 
     #bo functions
     CleanUpSystem (
-        [Logger] $Logger
+        [Logger] $Logger,
+        [DiskInformation] $DiskInformation
     ) {
+        $this.DiskInformation = $DiskInformation
         $this.Logger = $Logger
+
         $this.CurrentDate = Get-Date -Format "yyyyMMdd"
         $this.CollectionOfMandatoryFilesToLoad = New-Object System.Collections.ArrayList
         $this.CollectionOfOptionalFilesToLoad = New-Object System.Collections.ArrayList
@@ -410,11 +339,10 @@ Class CleanUpSystem {
         #----
         #bo: clean up
         $startDateTime = (Get-Date)
-        $startDiskInformation = Create-DiskInformation
 
         New-LockFileOrExit $lockFilePath $this.Logger
 
-        Write-DiskspaceLog $this.Logger $startDiskInformation
+        Write-DiskspaceLog $this.Logger $this.DiskInformation
 
         #disable windows update service to enable cleanup of >>c:\windows\softwaredistribution<<
         Get-Service -Name wuauserv | Stop-Service -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue -Verbose
@@ -685,6 +613,7 @@ Function Start-PathTruncations {
 }
 
 $CleanUpSystem = [CleanUpSystem]::new(
-    [Logger]::new()
+    [Logger]::new(),
+    [DiskInformation]::new()
 )
 $CleanUpSystem.Start()
