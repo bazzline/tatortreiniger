@@ -43,6 +43,13 @@ You should run this script when no user is using the system, like at night.
 
 At the end, you iterate over a big list of locations and delete the content of it.
 
+## Register the script as scheduled job
+
+```
+#@see: https://sid-500.com/2022/01/05/register-and-create-scheduled-jobs-with-powershell/
+Register-ScheduledJob -Name <string: hostname> -FilePath <string: path to the ps1 file> -Trigger (New-JobTrigger -Once -At (Get-Date) -RepetitionInterval (New-TimeSpane -Days 1) -RepeatIndefinitely).
+```
+
 # Links
 
 * [Clean Browser Cache and Recycle Bin](https://github.com/Bromeego/Clean-Temp-Files) - 20210406
