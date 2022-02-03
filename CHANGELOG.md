@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### To Add
 
+* add the following feature
+    * We found paths like `c:\users\<username>\AppData\Roaming\abdata\abfsal\abdfsal_v*` where there are multiple directories with the name `abdfsal_v*`
+    * Implement a simple configuration logic to keep only the last two directories of the matches (ordered by time) but remove the other matching directory names
 * add or replace logging of "starting <function name>" with `"$($PSCmdlet.MyInvocation.MyCommand.Name)"`. [see](https://arcanecode.com/2021/09/27/fun-with-powershell-write-verbose/)
     * Refactor `Write-LogMessage` by using the `Write-Verbose` etc. message types
 * add usage of [transcript](https://www.tutorialspoint.com/how-to-use-a-transcript-in-powershell)
