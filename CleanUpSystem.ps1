@@ -157,10 +157,10 @@ Function Create-StatisticObject {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
-        [System.TimeSpan]$runDatetime,
+        [System.TimeSpan] $runDatetime,
 
         [Parameter(Mandatory = $true)]
-        [int]$numberOfRemovedFileSystemObjects,
+        [int] $numberOfRemovedFileSystemObjects,
 
         [Parameter(Mandatory = $true)]
         [DiskInformation] $startDiskInformation,
@@ -170,7 +170,7 @@ Function Create-StatisticObject {
     )
 
     $startFreeSizeInGB = $startDiskInformation.GetFreeSizeInGB -replace ",", "."
-    $endFreeSizeInGB = $endDiskInformation.free_size_in_gb -replace ",", "."
+    $endFreeSizeInGB = $endDiskInformation.GetFreeSizeInGB -replace ",", "."
 
     $properties = @{
         runtime = @{
@@ -180,7 +180,7 @@ Function Create-StatisticObject {
         }
         disk = @{
             number_of_removed_file_system_objects = $numberOfRemovedFileSystemObjects
-            freed_up_disk_space = ($endFreeSizeInGB - $startFreeSizeInGB)
+            freed_up_disk_space = ([math]::Round($endDiskInformation.GetFreeSizeInGB - $startFreeSizeInGB.GetFreeSizeInGB, 2))
         }
     }
 
